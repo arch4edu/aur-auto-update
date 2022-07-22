@@ -9,3 +9,4 @@ Automatically update the PKGBUILD on AUR when there is a new version of a packag
 * (Optional) Write the corresponding `update/${pkgbase}.sh` for your package if necessary.
 > The default is `update/default.sh`
 * Done. You can check the outputs of [GitHub Actions](https://github.com/arch4edu/aur-auto-update/actions) if there is anything wrong.
+> It runs every day.
