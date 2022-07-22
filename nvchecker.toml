@@ -1,0 +1,13 @@
+[__config__]
+oldver = "cache/oldver.json"
+newver = "cache/newver.json"
+
+[python-librosa]
+source = "github"
+github = "librosa/librosa"
+use_latest_release = true
+
+[github-actions-bin]
+source = "github"
+github = "actions/runner"
+use_latest_release = true

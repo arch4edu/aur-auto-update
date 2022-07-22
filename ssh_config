@@ -1,0 +1,4 @@
+Host *
+	IdentityFile ~/.ssh/aur
+	StrictHostKeyChecking no
+	UserKnownHostsFile /dev/null
