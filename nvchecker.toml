@@ -16,3 +16,8 @@ use_latest_release = true
 source = "github"
 github = "bmcfee/resampy"
 use_latest_release = true
+
+[spek]
+source = "github"
+github = "alexkay/spek"
+use_latest_release = true
