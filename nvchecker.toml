@@ -7,6 +7,11 @@ source = "github"
 github = "actions/runner"
 use_latest_release = true
 
+[python-cupy]
+source = "github"
+github = "cupy/cupy"
+use_latest_release = true
+
 [python-librosa]
 source = "github"
 github = "librosa/librosa"
