@@ -51,7 +51,7 @@ jobs:
           mkdir -p cache
           nvchecker --logger both -c nvchecker.toml | tee nvchecker.log
 
-      - name: Update database
+      - name: Update AUR
         run: |
           grep '"event": "updated"' nvchecker.log | while read line
           do
