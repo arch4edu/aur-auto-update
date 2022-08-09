@@ -3,6 +3,11 @@ oldver = "cache/oldver.json"
 newver = "cache/newver.json"
 keyfile = "keyfile.toml"
 
+[apache-lucene]
+source = "regex"
+regex = 'lucene-([\d.]+)-src.tgz'
+url = "https://lucene.apache.org/core/downloads.html"
+
 [github-actions-bin]
 source = "github"
 github = "actions/runner"
