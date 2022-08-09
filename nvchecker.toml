@@ -1,6 +1,7 @@
 [__config__]
 oldver = "cache/oldver.json"
 newver = "cache/newver.json"
+keyfile = "keyfile.toml"
 
 [github-actions-bin]
 source = "github"

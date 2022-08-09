@@ -49,6 +49,7 @@ jobs:
       - name: Run nvchecker
         run: |
           mkdir -p cache
+          sed "s/GITHUB_TOKEN/${{ secrets.GITHUB_TOKEN}}/" -i keyfile.toml
           nvchecker --logger both -c nvchecker.toml | tee nvchecker.log
 
       - name: Update AUR
