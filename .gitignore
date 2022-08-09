@@ -2,3 +2,4 @@
 *.json
 *.sw*
 */
+!update-scripts/

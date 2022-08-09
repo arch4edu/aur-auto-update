@@ -7,6 +7,11 @@ source = "github"
 github = "actions/runner"
 use_latest_release = true
 
+[openfoam]
+source = "github"
+github = "OpenFOAM/OpenFOAM-10"
+use_latest_tag = true
+
 [python-cupy]
 source = "github"
 github = "cupy/cupy"
