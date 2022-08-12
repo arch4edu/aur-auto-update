@@ -18,6 +18,11 @@ source = "regex"
 regex = 'RELEASE NOTES FOR HEASOFT ([\d.]+)'
 url = "https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html"
 
+[jgit]
+source = "regex"
+regex = 'Direct Download ([\d.]+.*)</h2>'
+url = "http://www.eclipse.org/jgit/download/"
+
 [openfoam]
 source = "github"
 github = "OpenFOAM/OpenFOAM-10"
