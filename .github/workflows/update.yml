@@ -3,6 +3,7 @@ name: AUR auto update
 on:
   schedule:
     - cron: '53 7 * * *'
+  push:
   workflow_dispatch:
 
 jobs:
