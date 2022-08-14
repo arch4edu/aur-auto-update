@@ -28,6 +28,11 @@ source = "github"
 github = "OpenFOAM/OpenFOAM-10"
 use_latest_tag = true
 
+[python-audioread]
+source = "github"
+github = "beetbox/audioread"
+use_latest_tag = true
+
 [python-cupy]
 source = "github"
 github = "cupy/cupy"
