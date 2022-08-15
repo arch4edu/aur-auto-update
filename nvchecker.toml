@@ -18,6 +18,11 @@ source = "regex"
 regex = 'RELEASE NOTES FOR HEASOFT ([\d.]+)'
 url = "https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html"
 
+[hypre]
+source = "github"
+github = "hypre-space/hypre"
+use_max_tag = true
+
 [jgit]
 source = "regex"
 regex = 'Direct Download ([\d.]+.*)</h2>'
