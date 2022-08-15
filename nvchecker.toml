@@ -28,6 +28,11 @@ source = "github"
 github = "OpenFOAM/OpenFOAM-10"
 use_latest_tag = true
 
+[petsc-complex]
+source = "regex"
+regex = 'petsc-([\d.]+).tar.gz'
+url = "https://petsc.org/release/download/"
+
 [python-audioread]
 source = "github"
 github = "beetbox/audioread"
