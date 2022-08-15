@@ -53,6 +53,11 @@ source = "github"
 github = "cupy/cupy"
 use_latest_release = true
 
+[python-imread]
+source = "github"
+github = "luispedro/imread"
+use_max_tag = true
+
 [python-librosa]
 source = "github"
 github = "librosa/librosa"
