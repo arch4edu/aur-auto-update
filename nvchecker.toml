@@ -28,6 +28,11 @@ source = "regex"
 regex = 'Direct Download ([\d.]+.*)</h2>'
 url = "http://www.eclipse.org/jgit/download/"
 
+[kahip]
+source = "github"
+github = "KaHIP/KaHIP"
+use_latest_release = true
+
 [openfoam]
 source = "github"
 github = "OpenFOAM/OpenFOAM-10"
