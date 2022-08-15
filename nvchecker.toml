@@ -58,6 +58,11 @@ source = "github"
 github = "numpy/numpy"
 use_latest_release = true
 
+[python-mkl-random]
+source = "github"
+github = "IntelPython/mkl_random"
+use_latest_release = true
+
 [python-resampy]
 source = "github"
 github = "bmcfee/resampy"
