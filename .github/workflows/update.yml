@@ -28,7 +28,7 @@ jobs:
       - name: Install runtime dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm --needed base-devel git jq nvchecker pacman-contrib openssh
+          pacman -S --noconfirm --needed base-devel git jq nvchecker pacman-contrib openssh python-packaging
 
       - uses: actions/checkout@master
 
@@ -52,6 +52,7 @@ jobs:
           mkdir -p cache
           sed "s/GITHUB_TOKEN/${{ secrets.GITHUB_TOKEN}}/" -i keyfile.toml
           sed "s/^#keyfile/keyfile/" -i nvchecker.toml
+          set -o pipefail
           nvchecker --logger both -c nvchecker.toml | tee nvchecker.log
 
       - name: Update AUR
