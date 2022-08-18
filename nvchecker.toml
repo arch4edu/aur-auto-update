@@ -53,6 +53,11 @@ source = "github"
 github = "cupy/cupy"
 use_latest_release = true
 
+[python-pydub]
+source = "github"
+github = "jiaaro/pydub"
+use_latest_release = true
+
 [python-imread]
 source = "github"
 github = "luispedro/imread"
