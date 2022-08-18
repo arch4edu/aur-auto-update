@@ -78,6 +78,11 @@ source = "github"
 github = "IntelPython/mkl_random"
 use_latest_release = true
 
+[python-pywavelets]
+source = "github"
+github = "pywavelets/pywt"
+use_latest_release = true
+
 [python-requests-cache]
 source = "github"
 github = "requests-cache/requests-cache"
