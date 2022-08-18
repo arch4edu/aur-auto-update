@@ -78,6 +78,10 @@ source = "github"
 github = "IntelPython/mkl_random"
 use_latest_release = true
 
+[python-pydotplus]
+source = "pypi"
+pypi = "pydotplus"
+
 [python-pydub]
 source = "github"
 github = "jiaaro/pydub"
