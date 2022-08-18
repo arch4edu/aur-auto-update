@@ -78,6 +78,11 @@ source = "github"
 github = "IntelPython/mkl_random"
 use_latest_release = true
 
+[python-pydub]
+source = "github"
+github = "jiaaro/pydub"
+use_latest_release = true
+
 [python-pywavelets]
 source = "github"
 github = "pywavelets/pywt"
