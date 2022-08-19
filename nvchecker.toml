@@ -121,3 +121,8 @@ use_latest_release = true
 source = "github"
 github = "xiaoyeli/superlu_dist"
 use_latest_release = true
+
+[tfsec-bin]
+source = "github"
+github = "aquasecurity/tfsec"
+use_latest_tag = true

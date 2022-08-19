@@ -10,7 +10,7 @@ Automatically update the PKGBUILD on AUR when there is a new version of a packag
   nvchecker -c nvchecker.toml -e the_added_package
   ```
   * There might be a more simple way for this step in the future instead of creating pull requests.
-* (Optional) Write the corresponding `update/${pkgbase}.sh` for your package if necessary.  
+* (Optional) Write the corresponding `update/${pkgbase}.sh` for your package if necessary.
   * The default script `update/default.sh` will automatically strip the leading non-version characters, and is suitable for versions like `1.0.0`, `v1.0.0`, `version-1.0.0`.
-* Done. You can check the outputs of [GitHub Actions](https://github.com/arch4edu/aur-auto-update/actions) if there is anything wrong.  
+* Done. You can check the outputs of [GitHub Actions](https://github.com/arch4edu/aur-auto-update/actions) if there is anything wrong.
   * It runs every day.
