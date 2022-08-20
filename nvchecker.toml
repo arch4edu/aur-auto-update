@@ -63,6 +63,16 @@ source = "github"
 github = "librosa/librosa"
 use_latest_release = true
 
+[python-mkl-random]
+source = "github"
+github = "IntelPython/mkl_random"
+use_latest_release = true
+
+[python-mkl-service]
+source = "github"
+github = "IntelPython/mkl-service"
+use_latest_release = true
+
 [python-multiprocess]
 source = "github"
 github = "uqfoundation/multiprocess"
@@ -71,11 +81,6 @@ use_latest_release = true
 [python-numpy-mkl]
 source = "github"
 github = "numpy/numpy"
-use_latest_release = true
-
-[python-mkl-random]
-source = "github"
-github = "IntelPython/mkl_random"
 use_latest_release = true
 
 [python-pydotplus]
