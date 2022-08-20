@@ -1,0 +1,26 @@
+name: Check pull requests
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+
+  check:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+
+    steps:
+      - uses: arch4edu/cactus/actions/upgrade-archlinux@main
+
+      - name: Install runtime dependencies
+        run: pacman -S --noconfirm --needed git nvchecker python-requests python-toml
+
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Check nvchecker.toml
+        run: |
+          git config --global --add safe.directory $(realpath .)
+          sed "s/GITHUB_TOKEN/${{ secrets.GITHUB_TOKEN}}/" -i keyfile.toml
+          python check-pr.py
