@@ -38,6 +38,11 @@ source = "github"
 github = "KaHIP/KaHIP"
 use_latest_release = true
 
+[libxc]
+source = "gitlab"
+gitlab = "libxc/libxc"
+use_max_tag = true
+
 [openfoam]
 source = "github"
 github = "OpenFOAM/OpenFOAM-10"
