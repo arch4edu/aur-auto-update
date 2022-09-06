@@ -3,6 +3,11 @@ oldver = "cache/oldver.json"
 newver = "cache/newver.json"
 #keyfile = "keyfile.toml"
 
+[anaconda]
+source = "regex"
+regex = 'Anaconda3-([\d.]+)-Linux-x86_64.sh'
+url = "https://repo.anaconda.com/archive/"
+
 [apache-lucene]
 source = "regex"
 regex = 'lucene-([\d.]+)-src.tgz'
