@@ -18,6 +18,11 @@ source = "github"
 github = "cp2k/cp2k"
 use_latest_release = true
 
+[fet-timetabling]
+source = "regex"
+regex = 'fet-([\d.]+).tar.bz2'
+url = "https://lalescu.ro/liviu/fet/download.html"
+
 [github-actions-bin]
 source = "github"
 github = "actions/runner"
