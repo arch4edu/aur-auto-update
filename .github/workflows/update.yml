@@ -54,6 +54,5 @@ jobs:
             pkgbase=$(echo $line | jq -r '.name')
             newver=$(echo $line | jq -r '.version')
             [ -f update-scripts/${pkgbase}.sh ] && script=${pkgbase}.sh || script=default.sh
-            sh -ex update-scripts/${script} ${pkgbase} ${newver}
-            nvtake -c nvchecker.toml ${pkgbase}
+            sh -ex update-scripts/${script} ${pkgbase} ${newver} && nvtake -c nvchecker.toml ${pkgbase} || echo "::error Failed to update ${pkgbase}."
           done
