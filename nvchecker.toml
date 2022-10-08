@@ -53,6 +53,11 @@ source = "gitlab"
 gitlab = "libxc/libxc"
 use_max_tag = true
 
+[netron]
+source = "github"
+github = "lutzroeder/netron"
+use_latest_release = true
+
 [nni]
 source = "github"
 github = "microsoft/nni"
