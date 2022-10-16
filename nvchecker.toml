@@ -18,6 +18,16 @@ source = "github"
 github = "cp2k/cp2k"
 use_latest_release = true
 
+[basix]
+source = "github"
+github = "FEniCS/basix"
+use_latest_release = true
+
+[dolfinx]
+source = "github"
+github = "FEniCS/dolfinx"
+use_latest_release = true
+
 [fet-timetabling]
 source = "regex"
 regex = 'fet-([\d.]+).tar.bz2'
@@ -81,6 +91,26 @@ use_latest_tag = true
 [python-cupy]
 source = "github"
 github = "cupy/cupy"
+use_latest_release = true
+
+[python-fenics-basix]
+source = "github"
+github = "FEniCS/basix"
+use_latest_release = true
+
+[python-fenics-dolfinx]
+source = "github"
+github = "FEniCS/dolfinx"
+use_latest_release = true
+
+[python-fenics-ffcx]
+source = "github"
+github = "FEniCS/ffcx"
+use_latest_release = true
+
+[python-fenics-ufl]
+source = "github"
+github = "FEniCS/ufl"
 use_latest_release = true
 
 [python-imread]
