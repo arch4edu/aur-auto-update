@@ -13,14 +13,14 @@ source = "regex"
 regex = 'lucene-([\d.]+)-src.tgz'
 url = "https://lucene.apache.org/core/downloads.html"
 
-[cp2k-bin]
-source = "github"
-github = "cp2k/cp2k"
-use_latest_release = true
-
 [basix]
 source = "github"
 github = "FEniCS/basix"
+use_latest_release = true
+
+[cp2k-bin]
+source = "github"
+github = "cp2k/cp2k"
 use_latest_release = true
 
 [dolfinx]
