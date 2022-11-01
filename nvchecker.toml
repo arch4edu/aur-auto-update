@@ -63,6 +63,11 @@ source = "gitlab"
 gitlab = "libxc/libxc"
 use_max_tag = true
 
+[mumps-par]
+source = "regex"
+regex = '<a href="index.php\?page=dwnld">([\d.]+.*)</a>'
+url = "https://graal.ens-lyon.fr/MUMPS/index.php"
+
 [netron]
 source = "github"
 github = "lutzroeder/netron"
