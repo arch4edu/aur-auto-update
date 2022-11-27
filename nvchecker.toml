@@ -88,6 +88,11 @@ source = "regex"
 regex = 'petsc-([\d.]+).tar.gz'
 url = "https://petsc.org/release/download/"
 
+[pixlet]
+source = "github"
+github = "tidbyt/pixlet"
+use_latest_release = true
+
 [python-audioread]
 source = "github"
 github = "beetbox/audioread"
