@@ -206,3 +206,9 @@ use_latest_release = true
 source = "github"
 github = "aquasecurity/tfsec"
 use_latest_tag = true
+
+[vvc-vtm]
+source = "gitlab"
+gitlab = "jvet/VVCSoftware_VTM"
+host = "vcgit.hhi.fraunhofer.de"
+use_max_tag = true
