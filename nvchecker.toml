@@ -63,6 +63,11 @@ source = "gitlab"
 gitlab = "libxc/libxc"
 use_max_tag = true
 
+[meteoinfo]
+source = "regex"
+regex = 'files/MeteoInfo_([\d.]+).zip'
+url = "http://meteothink.org/downloads/index.html"
+
 [mumps-par]
 source = "regex"
 regex = '<a href="index.php\?page=dwnld">([\d.]+.*)</a>'
