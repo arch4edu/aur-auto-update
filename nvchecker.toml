@@ -192,6 +192,11 @@ source = "github"
 github = "niksite/url-normalize"
 use_latest_release = true
 
+[python-wrf]
+source = "github"
+github = "NCAR/wrf-python"
+use_latest_release = true
+
 [r-bas]
 source = "regex"
 regex = 'BAS_([\d.]+).tar.gz'
