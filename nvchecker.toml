@@ -3,6 +3,11 @@ oldver = "cache/oldver.json"
 newver = "cache/newver.json"
 #keyfile = "keyfile.toml"
 
+[adwaita-for-steam]
+source = "github"
+github = "tkashkin/adwaita-for-steam"
+use_latest_release = true
+
 [anaconda]
 source = "regex"
 regex = 'Anaconda3-([\d.]+)-Linux-x86_64.sh'
@@ -21,6 +26,11 @@ use_latest_release = true
 [cp2k-bin]
 source = "github"
 github = "cp2k/cp2k"
+use_latest_release = true
+
+[denaro]
+source = "github"
+github = "nlogozzo/nickvisionmoney"
 use_latest_release = true
 
 [dolfinx]
@@ -216,6 +226,11 @@ use_latest_release = true
 source = "github"
 github = "aquasecurity/tfsec"
 use_latest_tag = true
+
+[whatsapp-for-linux]
+source = "github"
+github = "eneshecan/whatsapp-for-linux"
+use_latest_release = true
 
 [vvc-vtm]
 source = "gitlab"
