@@ -18,5 +18,5 @@ sed "s/^pkgrel=.*$/pkgrel=1/" -i PKGBUILD
 su makepkg -c 'updpkgsums'
 su makepkg -c 'makepkg --printsrcinfo' > .SRCINFO
 git add PKGBUILD .SRCINFO
-git commit -m "auto updated to ${newver}"
+git commit -m "Auto updated to ${newver}"
 git push origin master
