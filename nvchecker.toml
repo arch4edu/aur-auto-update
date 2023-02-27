@@ -83,6 +83,11 @@ source = "regex"
 regex = '<a href="index.php\?page=dwnld">([\d.]+.*)</a>'
 url = "https://graal.ens-lyon.fr/MUMPS/index.php"
 
+[mybsmart]
+source = "regex"
+regex = 'version: ([\d.]+)'
+url = "http://res.bsmart.it.s3.amazonaws.com/mybsmart_desktop/releases/production_v2/linux/latest-deb-x64.yml"
+
 [netron]
 source = "github"
 github = "lutzroeder/netron"
