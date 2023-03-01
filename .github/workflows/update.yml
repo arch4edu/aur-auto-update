@@ -56,3 +56,7 @@ jobs:
             [ -f update-scripts/${pkgbase}.sh ] && script=${pkgbase}.sh || script=default.sh
             sh -ex update-scripts/${script} ${pkgbase} ${newver} && nvtake -c nvchecker.toml ${pkgbase} || echo "::error Failed to update ${pkgbase}."
           done
+
+      - name: Clean up old cache
+        run: |
+          pacman -Sc --noconfirm
