@@ -24,7 +24,7 @@ github = "FEniCS/basix"
 use_latest_release = true
 
 [cavalier]
-source = "guthub"
+source = "github"
 github = "fsobolev/cavalier"
 use_latest_release = true
 
