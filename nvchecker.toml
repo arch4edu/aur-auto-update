@@ -23,6 +23,11 @@ source = "github"
 github = "FEniCS/basix"
 use_latest_release = true
 
+[cavalier]
+source = "guthub"
+github = "fsobolev/cavalier"
+use_latest_release = true
+
 [cp2k-bin]
 source = "github"
 github = "cp2k/cp2k"
@@ -31,6 +36,16 @@ use_latest_release = true
 [denaro]
 source = "github"
 github = "nlogozzo/nickvisionmoney"
+use_latest_release = true
+
+[desktop-files-creator]
+source = "github"
+github = "alexkdeveloper/desktop-files-creator"
+use_latest_release = true
+
+[detwinner]
+source = "github"
+github = "neatdecisions/detwinner"
 use_latest_release = true
 
 [dolfinx]
@@ -42,6 +57,11 @@ use_latest_release = true
 source = "regex"
 regex = 'fet-([\d.]+).tar.bz2'
 url = "https://lalescu.ro/liviu/fet/download.html"
+
+[furtherance]
+source = "github"
+github = "lakoliu/furtherance"
+use_latest_release = true
 
 [github-actions-bin]
 source = "github"
@@ -66,6 +86,11 @@ url = "http://www.eclipse.org/jgit/download/"
 [kahip]
 source = "github"
 github = "KaHIP/KaHIP"
+use_latest_release = true
+
+[keyoxidizer]
+source = "github"
+github = "shombando/keyoxidizer"
 use_latest_release = true
 
 [libxc]
@@ -227,6 +252,11 @@ source = "github"
 github = "xiaoyeli/superlu_dist"
 use_latest_release = true
 
+[text-engine]
+source = "github"
+github = "mjakeman/text-engine"
+use_latest_release = true
+
 [tfsec-bin]
 source = "github"
 github = "aquasecurity/tfsec"
@@ -241,4 +271,9 @@ use_max_tag = true
 [whatsapp-for-linux]
 source = "github"
 github = "eneshecan/whatsapp-for-linux"
+use_latest_release = true
+
+[zapzap]
+source = "github"
+github = "rafatosta/zapzap"
 use_latest_release = true
