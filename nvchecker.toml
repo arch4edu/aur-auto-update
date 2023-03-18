@@ -270,7 +270,7 @@ use_latest_tag = true
 
 [tube-converter]
 source = "github"
-github = "nlogozzo/nlogozzo/NickvisionTubeConverter"
+github = "nlogozzo/NickvisionTubeConverter"
 use_latest_release = true
 
 [vvc-vtm]
