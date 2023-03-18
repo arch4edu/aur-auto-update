@@ -97,6 +97,7 @@ use_latest_release = true
 source = "github"
 github = "shombando/keyoxidizer"
 use_latest_release = true
+from_pattern = 'v.[\d,.]+'
 
 [libxc]
 source = "gitlab"
