@@ -72,6 +72,7 @@ use_latest_release = true
 source = "pagure"
 pagure = "background-logo-extension"
 use_latest_release = true
+exclude_regex = ".*beta"
 
 [heasoft]
 source = "regex"
