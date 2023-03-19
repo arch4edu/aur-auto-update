@@ -68,6 +68,12 @@ source = "github"
 github = "actions/runner"
 use_latest_release = true
 
+[gnome-shell-extension-background-logo]
+source = "pagure"
+pagure = "background-logo-extension"
+use_latest_release = true
+exclude_regex = ".*beta"
+
 [heasoft]
 source = "regex"
 regex = 'RELEASE NOTES FOR HEASOFT ([\d.]+)'
@@ -92,6 +98,7 @@ use_latest_release = true
 source = "github"
 github = "shombando/keyoxidizer"
 use_latest_release = true
+prefix = "v."
 
 [libxc]
 source = "gitlab"
@@ -261,6 +268,11 @@ use_latest_release = true
 source = "github"
 github = "aquasecurity/tfsec"
 use_latest_tag = true
+
+[tube-converter]
+source = "github"
+github = "nlogozzo/NickvisionTubeConverter"
+use_latest_release = true
 
 [vvc-vtm]
 source = "gitlab"
