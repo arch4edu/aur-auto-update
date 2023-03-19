@@ -45,6 +45,11 @@ def check_nvchecker(new_config):
         else:
             print(f'Successfully find version {result["version"]} for {result["name"]}.')
 
+def compare_dict(a, b):
+    a_json = json.dumps(a, sort_keys=True)
+    b_json = json.dumps(b, sort_keys=True)
+    return a_json == b_json
+
 if __name__ == '__main__':
 
     subprocess.run(['git', 'checkout', '-q', 'main'])
@@ -57,7 +62,7 @@ if __name__ == '__main__':
 
     check_sorted(new_config)
 
-    new_config = [(i, new_config[i]) for i in new_config.keys() if not i in old_config]
+    new_config = [(i, new_config[i]) for i in new_config.keys() if not i in old_config or not compare_dict(new_config[i], old_config[i])]
 
     for package, _ in new_config:
         check_aur_maintainer(package)
