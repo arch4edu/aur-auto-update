@@ -18,6 +18,11 @@ source = "regex"
 regex = 'lucene-([\d.]+)-src.tgz'
 url = "https://lucene.apache.org/core/downloads.html"
 
+[artemis-grading-bin]
+source = "github"
+github = "kit-sdq/programming-lecture-eclipse-artemis"
+use_latest_release = true
+
 [basix]
 source = "github"
 github = "FEniCS/basix"
