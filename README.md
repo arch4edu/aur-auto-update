@@ -1,6 +1,10 @@
 # Auto update bot [![AUR auto update](https://github.com/arch4edu/aur-auto-update/actions/workflows/update.yml/badge.svg)](https://github.com/arch4edu/aur-auto-update/actions/workflows/update.yml)
 Automatically update the PKGBUILD on AUR when there is a new version of a package.
 
+## Warning
+
+* Currently the bot will **not** test the PKGBUILD [yet](https://github.com/arch4edu/aur-auto-update/issues/30). 
+
 ## Quick guide
 
 * Add `AutoUpdateBot` as a co-maintainer of your package on AUR.
