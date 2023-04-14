@@ -1,0 +1,4 @@
+nvchecker:
+  github: neatdecisions/detwinner
+  source: github
+  use_latest_release: true

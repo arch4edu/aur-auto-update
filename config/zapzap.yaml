@@ -1,0 +1,4 @@
+nvchecker:
+  github: rafatosta/zapzap
+  source: github
+  use_latest_release: true

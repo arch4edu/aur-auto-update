@@ -1,0 +1,4 @@
+nvchecker:
+  regex: petsc-([\d.]+).tar.gz
+  source: regex
+  url: https://petsc.org/release/download/

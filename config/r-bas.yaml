@@ -1,0 +1,4 @@
+nvchecker:
+  regex: BAS_([\d.]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/BAS/index.html

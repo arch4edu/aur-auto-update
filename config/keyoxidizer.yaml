@@ -1,0 +1,5 @@
+nvchecker:
+  github: shombando/keyoxidizer
+  prefix: v.
+  source: github
+  use_latest_release: true

@@ -1,0 +1,4 @@
+nvchecker:
+  github: alexkdeveloper/desktop-files-creator
+  source: github
+  use_latest_release: true

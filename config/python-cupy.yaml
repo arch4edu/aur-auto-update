@@ -1,0 +1,4 @@
+nvchecker:
+  github: cupy/cupy
+  source: github
+  use_latest_release: true

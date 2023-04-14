@@ -1,0 +1,4 @@
+nvchecker:
+  github: OpenFOAM/OpenFOAM-10
+  source: github
+  use_latest_tag: true

@@ -1,0 +1,4 @@
+nvchecker:
+  regex: fet-([\d.]+).tar.bz2
+  source: regex
+  url: https://lalescu.ro/liviu/fet/download.html

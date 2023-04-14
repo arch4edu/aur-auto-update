@@ -1,0 +1,4 @@
+nvchecker:
+  github: FEniCS/basix
+  source: github
+  use_latest_release: true

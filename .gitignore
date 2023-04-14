@@ -1,6 +1,5 @@
 *.log
 *.json
 *.sw*
-*/
+cache/
 check.toml
-!update-scripts/

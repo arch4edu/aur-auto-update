@@ -1,0 +1,4 @@
+nvchecker:
+  github: lakoliu/furtherance
+  source: github
+  use_latest_release: true

@@ -1,0 +1,3 @@
+nvchecker:
+  pypi: pydotplus
+  source: pypi

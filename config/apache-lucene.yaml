@@ -1,0 +1,4 @@
+nvchecker:
+  regex: lucene-([\d.]+)-src.tgz
+  source: regex
+  url: https://lucene.apache.org/core/downloads.html
