@@ -3,7 +3,8 @@ Automatically update the PKGBUILD on AUR when there is a new version of a packag
 
 ## Warning
 
-* Currently the bot will **not** test the PKGBUILD [yet](https://github.com/arch4edu/aur-auto-update/issues/30). 
+* Currently the bot will **not** test the PKGBUILD [yet](https://github.com/arch4edu/aur-auto-update/issues/30).
+* The bot is suspended until we implement the test mechanism. Don't worry, we'll be back soon.
 
 ## Quick guide
 
