@@ -1,0 +1,17 @@
+nvchecker:
+  regex: pkgname-([\d.]+).tar.gz
+  source: regex
+  url: https://www.example.com/
+pkgver: get-pkgver
+test:
+  enable: true
+  key: |
+    jWyfbrKLab8ni0lyQnjGvwwfPzsJ51vJ+FMlu7p9r+PUipgu1ZJ7Qorx0F4RuHcGFXS6W3QYFUL7
+    y7bCpfr93vazUUbBE5TthpzR/m/QZJXZ6OoLpBSjJohgWPcax3ISAz5nsx63e9olrfEFuOj6aKGK
+    XRZEuS5YYokFjzebSjk6E6zXvlScbR/0eyD9aFU3Up7mgMxDYD56dCVTMOqDep4frbzlxloJaaJo
+    7+/EWjNsN6wQ7L9ShL1R3oTKZK2zlh70FPXOXfpJZ+douJ8bP6zc3zm24orce1ZATOQ3nS61FMSD
+    tkKujPOABsngJB6/u0lFUoatRaYYhKCtCRbMoThJ2EU8wTUoxjPU9pJJCYOm0x+vhaN9ZcvcnW4C
+    uUNDyew1Ie9/Cqz9pB/wptwh43ktsLRkFH8ptqZZRE96AEq8wJG+IKwIAiqevWpGN7K7404jRlAK
+    aG5CHyzVxIChU1fJvkwh2vOx1l5jRMDcdCiL0i/nZxewJB3VN4RJo/JkcDBDCivUH3YRVWbPZdpW
+    CBV8UOrxVibZ2NrlPh1x3MSnJh2rs6fXQLaAgP3aHMYuUz+sEr/WorUypknvx82KUkv0kYtmtDbF
+    tr94uhoFXQMGIo3I1yI4EwPTxtR4mC43/h1eoIGv3OyD5ZH3kHZ0RADt+XynESZ9mOMgqGD3Y+4=
