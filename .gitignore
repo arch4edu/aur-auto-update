@@ -3,3 +3,4 @@
 *.sw*
 cache/
 check.toml
+*.key
