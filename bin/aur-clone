@@ -1,0 +1,6 @@
+#!/bin/sh
+pkgbase="$1"
+
+git clone ssh://aur@aur.archlinux.org/${pkgbase}.git
+git config --global --add safe.directory $(realpath ${pkgbase})
+chown makepkg:root -R ${pkgbase}
