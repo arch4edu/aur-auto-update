@@ -1,0 +1,54 @@
+name: Build test
+
+run-name: Build test for ${{ inputs.pkgbase }} at ${{ inputs.pkgver }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      pkgbase:
+        required: true
+      pkgver:
+        required: true
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
+
+    steps:
+      - uses: arch4edu/cactus/actions/upgrade-archlinux@main
+
+      - name: Install runtime dependencies
+        run: pacman -S --noconfirm --needed base-devel devtools dbus git pacman-contrib
+
+      - uses: arch4edu/cactus/actions/config-makepkg@main
+
+      - uses: actions/checkout@master
+
+      - name: Configure git and ssh
+        run: |
+          echo "${{ secrets.SSH_KEY }}" | install -Dm400 /dev/stdin /root/.ssh/aur
+          cp ssh_config /root/.ssh/config
+          git config --global user.name 'Auto update bot'
+          git config --global user.email 'auto-update-bot@arch4edu.org'
+
+      - name: Add path
+        run: echo "$(realpath bin)" >> $GITHUB_PATH
+
+      - name: Build ${{ github.event.inputs.pkgbase }} at ${{ inputs.pkgver }}
+        run: |
+          aur-clone ${{ github.event.inputs.pkgbase }}
+          cd ${{ github.event.inputs.pkgbase }}
+          update-pkgver ${{ github.event.inputs.pkgver }}
+          su makepkg -c extra-x86_64-build
+
+      - name: Push to AUR when success
+        run: |
+          cd ${{ github.event.inputs.pkgbase }}
+          [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && aur-push
+
+      - name: Clean up old cache
+        run: pacman -Sc --noconfirm
