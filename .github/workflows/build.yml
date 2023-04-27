@@ -38,6 +38,9 @@ jobs:
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
 
+      - name: Override update script
+        run: find config -name ${{ github.event.inputs.pkgbase }}.sh -exec cp {} bin/update-pkgver \;
+
       - name: Build ${{ github.event.inputs.pkgbase }} at ${{ inputs.pkgver }}
         run: |
           aur-clone ${{ github.event.inputs.pkgbase }}
