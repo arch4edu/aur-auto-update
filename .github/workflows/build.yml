@@ -1,6 +1,6 @@
 name: Build test
 
-run-name: Build test for ${{ inputs.pkgbase }} at ${{ inputs.pkgver }}
+run-name: Build test for ${{ inputs.pkgbase }} ${{ inputs.pkgver }}
 
 on:
   workflow_dispatch:
@@ -17,6 +17,8 @@ jobs:
     container:
       image: archlinux
       options: --privileged
+    outputs:
+      built: ${{ steps.build.outputs.built }}
 
     steps:
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
@@ -28,13 +30,6 @@ jobs:
 
       - uses: actions/checkout@master
 
-      - name: Configure git and ssh
-        run: |
-          echo "${{ secrets.SSH_KEY }}" | install -Dm400 /dev/stdin /root/.ssh/aur
-          cp ssh_config /root/.ssh/config
-          git config --global user.name 'Auto update bot'
-          git config --global user.email 'auto-update-bot@arch4edu.org'
-
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
 
@@ -43,17 +38,51 @@ jobs:
           find config -name ${{ github.event.inputs.pkgbase }}.override -exec cp {} bin/update-pkgver \;
           chmod +x bin/update-pkgver
 
-      - name: Build ${{ github.event.inputs.pkgbase }} at ${{ inputs.pkgver }}
+      - name: Build ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }}
+        id: build
         run: |
           aur-clone ${{ github.event.inputs.pkgbase }}
           cd ${{ github.event.inputs.pkgbase }}
           update-pkgver ${{ github.event.inputs.pkgver }}
           su makepkg -c extra-x86_64-build
-
-      - name: Push to AUR when success
-        run: |
-          cd ${{ github.event.inputs.pkgbase }}
-          [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && aur-push
+          [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && echo "built=1" >> "$GITHUB_OUTPUT" || echo "built=0" >> "$GITHUB_OUTPUT"
 
       - name: Clean up old cache
         run: pacman -Sc --noconfirm
+
+  push:
+    needs: build
+    if: ${{ needs.build.outputs.built == 1 }}
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+
+    steps:
+      - uses: arch4edu/cactus/actions/upgrade-archlinux@main
+
+      - name: Install runtime dependencies
+        run: pacman -S --noconfirm --needed base-devel git pacman-contrib
+
+      - uses: actions/checkout@master
+
+      - name: Add path
+        run: echo "$(realpath bin)" >> $GITHUB_PATH
+
+      - name: Configure git and ssh
+        run: |
+          echo "${{ secrets.SSH_KEY }}" | install -Dm400 /dev/stdin /root/.ssh/aur
+          cp ssh_config /root/.ssh/config
+          git config --global user.name 'Auto update bot'
+          git config --global user.email 'auto-update-bot@arch4edu.org'
+
+      - name: Override update script
+        run: |
+          find config -name ${{ github.event.inputs.pkgbase }}.override -exec cp {} bin/update-pkgver \;
+          chmod +x bin/update-pkgver
+
+      - name: Push ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }} to AUR
+        run: |
+          aur-clone ${{ github.event.inputs.pkgbase }}
+          cd ${{ github.event.inputs.pkgbase }}
+          update-pkgver ${{ github.event.inputs.pkgver }}
+          aur-push
