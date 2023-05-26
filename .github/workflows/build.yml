@@ -38,13 +38,24 @@ jobs:
           find config -name ${{ github.event.inputs.pkgbase }}.override -exec cp {} bin/update-pkgver \;
           chmod +x bin/update-pkgver
 
+      - name: Configure custom repository
+        run: |
+          [ -z "$(find config -name ${{ github.event.inputs.pkgbase }}.repository)" ] && exit 0
+          cat /usr/share/devtools/pacman.conf.d/extra.conf $(find config -name ${{ github.event.inputs.pkgbase }}.repository) > /usr/share/devtools/pacman.conf.d/custom.conf
+          ln -s /usr/bin/archbuild /usr/bin/custom-x86_64-build
+
       - name: Build ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }}
         id: build
         run: |
           aur-clone ${{ github.event.inputs.pkgbase }}
           cd ${{ github.event.inputs.pkgbase }}
           update-pkgver ${{ github.event.inputs.pkgver }}
-          su makepkg -c extra-x86_64-build
+          if [ -f /usr/bin/custom-x86_64-build ]
+          then
+            su makepkg -c custom-x86_64-build || :
+          else
+            su makepkg -c extra-x86_64-build || :
+          fi
           [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && echo "built=1" >> "$GITHUB_OUTPUT" || echo "built=0" >> "$GITHUB_OUTPUT"
 
       - name: Clean up old cache
@@ -61,19 +72,20 @@ jobs:
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
 
       - name: Install runtime dependencies
-        run: pacman -S --noconfirm --needed base-devel git pacman-contrib
+        run: pacman -S --noconfirm --needed base-devel git pacman-contrib openssh
 
       - uses: actions/checkout@master
 
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
 
-      - name: Configure git and ssh
+      - name: Configure git makepkg and ssh
         run: |
           echo "${{ secrets.SSH_KEY }}" | install -Dm400 /dev/stdin /root/.ssh/aur
           cp ssh_config /root/.ssh/config
           git config --global user.name 'Auto update bot'
           git config --global user.email 'auto-update-bot@arch4edu.org'
+          useradd makepkg
 
       - name: Override update script
         run: |
