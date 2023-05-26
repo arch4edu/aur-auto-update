@@ -1,6 +1,13 @@
 #!/bin/sh
+set -e
+
 pkgbase="$1"
 
-git clone ssh://aur@aur.archlinux.org/${pkgbase}.git
+if [ -f /root/.ssh/aur ]
+then
+	git clone ssh://aur@aur.archlinux.org/${pkgbase}.git
+else
+	git clone https://aur.archlinux.org/${pkgbase}.git
+fi
 git config --global --add safe.directory $(realpath ${pkgbase})
 chown makepkg:root -R ${pkgbase}
