@@ -61,17 +61,26 @@ jobs:
   push:
     needs: build
     if: ${{ needs.build.outputs.built == 1 }}
+    concurrency: nvchecker
     runs-on: ubuntu-latest
     container:
       image: archlinux
 
     steps:
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
+        id: init
 
       - name: Install runtime dependencies
-        run: pacman -S --noconfirm --needed base-devel git pacman-contrib openssh
+        run: pacman -S --noconfirm --needed base-devel git nvchecker openssh pacman-contrib python-toml python-yaml
 
       - uses: actions/checkout@master
+
+      - name: Set up nvchecker cache
+        uses: actions/cache@master
+        with:
+          path: cache
+          key: nvchecker-${{ steps.init.outputs.time }}
+          restore-keys: nvchecker-
 
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
@@ -95,3 +104,8 @@ jobs:
           cd ${{ github.event.inputs.pkgbase }}
           update-pkgver ${{ github.event.inputs.pkgver }}
           aur-push
+
+      - name: Update the nvchecker cache
+        run: |
+          python nvchecker.py $(find config -name ${{ github.event.inputs.pkgbase }}.yaml)
+          nvtake -c nvchecker.toml ${{ github.event.inputs.pkgbase }}
