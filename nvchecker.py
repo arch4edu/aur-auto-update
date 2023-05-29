@@ -1,4 +1,5 @@
 #!/bin/python
+import json
 import logging
 import os
 import sys
@@ -12,12 +13,15 @@ nvchecker_toml = toml.load("config/__config__.toml")
 if not 'GITHUB_TOKEN' in os.environ and 'keyfile' in nvchecker_toml['__config__']:
     del nvchecker_toml['__config__']['keyfile']
 
+oldver = {}
 for i in [Path(j) for j in sys.argv[1:]] if len(sys.argv) > 1 else Path("config").rglob("*.yaml"):
     if i.stem in ["example"]:
         continue
     try:
         with open(i) as f:
             config = yaml.safe_load(f)
+            if 'oldver' in config:
+                oldver[i.stem] = config['oldver']
             config = config["nvchecker"]
             config["user_agent"] = "nvchecker"
             nvchecker_toml[i.stem] = config
@@ -28,3 +32,6 @@ for i in [Path(j) for j in sys.argv[1:]] if len(sys.argv) > 1 else Path("config"
 
 with open("nvchecker.toml", "w") as f:
     toml.dump(nvchecker_toml, f)
+
+with open("oldver.json", "w") as f:
+    json.dump(oldver, f)
