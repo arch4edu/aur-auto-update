@@ -2,3 +2,4 @@ nvchecker:
   regex: files/MeteoInfo_([\d.]+).zip
   source: regex
   url: http://meteothink.org/downloads/index.html
+test: true
