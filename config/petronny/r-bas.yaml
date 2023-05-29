@@ -3,3 +3,4 @@ nvchecker:
   source: regex
   url: https://cran.r-project.org/web/packages/BAS/index.html
 test: true
+oldver: 1.6.4
