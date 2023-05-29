@@ -2,3 +2,4 @@ nvchecker:
   github: xiaoyeli/superlu_dist
   source: github
   use_latest_release: true
+test: true

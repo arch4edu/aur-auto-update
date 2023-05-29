@@ -2,3 +2,4 @@ nvchecker:
   github: luispedro/imread
   source: github
   use_max_tag: true
+test: true

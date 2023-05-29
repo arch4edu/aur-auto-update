@@ -2,3 +2,4 @@ nvchecker:
   github: requests-cache/requests-cache
   source: github
   use_max_tag: true
+test: true

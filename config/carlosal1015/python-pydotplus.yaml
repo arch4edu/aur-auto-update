@@ -1,3 +1,4 @@
 nvchecker:
   pypi: pydotplus
   source: pypi
+test: true
