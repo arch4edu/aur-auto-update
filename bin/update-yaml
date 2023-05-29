@@ -1,0 +1,10 @@
+#!/bin/sh
+yaml=$1
+version=$2
+
+if [ -z "$(grep '^oldver: ' $yaml)" ]
+then
+	echo "oldver: $version" >> $yaml
+else
+	sed "/^oldver: /s/^.*$/oldver: $version" -i $yaml
+fi
