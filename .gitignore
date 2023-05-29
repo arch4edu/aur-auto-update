@@ -2,5 +2,6 @@
 *.json
 *.sw*
 cache/
-check.toml
+nvchecker.toml
 *.key
+*.txt

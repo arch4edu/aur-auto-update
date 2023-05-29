@@ -1,0 +1,47 @@
+name: Check update
+
+on:
+  #schedule:
+  #  - cron: '53 7 * * *'
+  #push:
+  #  branches:
+  #    - main
+  workflow_dispatch:
+
+jobs:
+
+  update:
+    concurrency: nvchecker
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+
+    steps:
+      - uses: arch4edu/cactus/actions/upgrade-archlinux@main
+        id: init
+
+      - name: Install runtime dependencies
+        run: pacman -S --noconfirm --needed jq nvchecker python-packaging python-pygithub python-toml python-yaml
+
+      - uses: actions/checkout@master
+
+      - name: Set up nvchecker cache
+        uses: actions/cache@master
+        with:
+          path: cache
+          key: nvchecker-${{ steps.init.outputs.time }}
+          restore-keys: nvchecker-
+
+      - name: Run nvchecker
+        run: |
+          mkdir -p cache
+          sed "s/GITHUB_TOKEN/${{ secrets._GITHUB_TOKEN }}/" -i config/keyfile.toml
+          sed "s/^#keyfile/keyfile/" -i config/__config__.yaml
+          python nvchecker.py
+          set -o pipefail
+          nvchecker --logger both -c nvchecker.toml > nvchecker.log
+
+      - name: Process updates
+        run: |
+          python process-update.py
+          [ -f nvtake.txt ] && nvtake -c nvchecker.toml $(cat nvtake.txt)

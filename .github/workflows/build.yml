@@ -58,9 +58,6 @@ jobs:
           fi
           [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && echo "built=1" >> "$GITHUB_OUTPUT" || echo "built=0" >> "$GITHUB_OUTPUT"
 
-      - name: Clean up old cache
-        run: pacman -Sc --noconfirm
-
   push:
     needs: build
     if: ${{ needs.build.outputs.built == 1 }}
