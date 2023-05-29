@@ -29,8 +29,8 @@ for line in lines:
                 flag = False if not "flag" in config else config["flag"]
                 test = False if not "test" in config else config["test"]
             if test:
-                github.get_repo('arch4edu/aur-auto-update').get_workflow("build.yml").create_dispatch('main', {'pkgbase': package, 'version': version})
-                print(f"Triggered build test for {package}.")
+                github.get_repo('arch4edu/aur-auto-update').get_workflow("build.yml").create_dispatch('main', {'pkgbase': package, 'pkgver': version})
+                print(f"Triggered build test for {package} {version}.")
             elif flag:
                 print(f"TODO: Flag {package} on AUR.")
                 # TODO: Flag the package on AUR
