@@ -2,3 +2,4 @@ nvchecker:
   regex: <a href="index.php\?page=dwnld">([\d.]+.*)</a>
   source: regex
   url: https://graal.ens-lyon.fr/MUMPS/index.php
+test: true

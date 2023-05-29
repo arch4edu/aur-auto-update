@@ -2,5 +2,5 @@ nvchecker:
   github: actions/runner
   source: github
   use_latest_release: true
-  prefix: 'v'
+  prefix: v
 test: true
