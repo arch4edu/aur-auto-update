@@ -2,3 +2,5 @@ nvchecker:
   github: mjakeman/text-engine
   source: github
   use_latest_release: true
+  prefix: v
+test: true

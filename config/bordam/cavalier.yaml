@@ -2,3 +2,4 @@ nvchecker:
   github: fsobolev/cavalier
   source: github
   use_latest_release: true
+test: true
