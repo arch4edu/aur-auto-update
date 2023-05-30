@@ -1,4 +1,4 @@
 nvchecker:
   pypi: pydotplus
   source: pypi
-test: true
+test: trueoldver: 2.0.2
