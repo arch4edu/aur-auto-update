@@ -2,4 +2,4 @@ nvchecker:
   github: FEniCS/ufl
   source: github
   use_latest_release: true
-test: true
+test: trueoldver: 2023.1.1.post0
