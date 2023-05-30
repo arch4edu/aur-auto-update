@@ -2,3 +2,4 @@ nvchecker:
   github: aquasecurity/tfsec
   source: github
   use_latest_tag: true
+test: true

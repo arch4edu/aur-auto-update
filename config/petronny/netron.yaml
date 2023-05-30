@@ -2,3 +2,4 @@ nvchecker:
   github: lutzroeder/netron
   source: github
   use_latest_release: true
+test: true
