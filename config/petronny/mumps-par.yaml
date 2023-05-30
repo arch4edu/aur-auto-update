@@ -1,5 +1,5 @@
 nvchecker:
   regex: <a href="index.php\?page=dwnld">([\d.]+.*)</a>
   source: regex
-  url: https://graal.ens-lyon.fr/MUMPS/index.php
+  url: https://mumps-solver.org/index.php
 test: true
