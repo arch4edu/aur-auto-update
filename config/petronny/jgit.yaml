@@ -2,3 +2,6 @@ nvchecker:
   regex: Direct Download ([\d.]+.*)</h2>
   source: regex
   url: http://www.eclipse.org/jgit/download/
+  from_pattern: -
+  to_pattern: _
+test: true
