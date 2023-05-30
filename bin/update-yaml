@@ -4,6 +4,7 @@ version=$2
 
 if [ -z "$(grep '^oldver: ' $yaml)" ]
 then
+	[ -n $(tail -c 1 $yaml) ] && echo >> $yaml
 	echo "oldver: $version" >> $yaml
 else
 	sed "/^oldver: /s/^.*$/oldver: $version/" -i $yaml
