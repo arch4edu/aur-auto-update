@@ -2,4 +2,4 @@ nvchecker:
   regex: petsc-([\d.]+).tar.gz
   source: regex
   url: https://petsc.org/release/download/
-test: true
+test: trueoldver: 3.19.1
