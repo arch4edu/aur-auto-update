@@ -2,3 +2,5 @@ nvchecker:
   github: pywavelets/pywt
   source: github
   use_latest_release: true
+  prefix: v
+test: true

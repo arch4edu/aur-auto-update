@@ -2,3 +2,4 @@ nvchecker:
   gitlab: libxc/libxc
   source: gitlab
   use_max_tag: true
+test: true

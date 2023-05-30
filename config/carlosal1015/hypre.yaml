@@ -2,3 +2,5 @@ nvchecker:
   github: hypre-space/hypre
   source: github
   use_max_tag: true
+  prefix: v
+test: true
