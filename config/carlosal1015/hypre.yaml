@@ -4,3 +4,4 @@ nvchecker:
   use_max_tag: true
   prefix: v
 test: true
+oldver: 2.28.0
