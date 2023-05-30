@@ -3,4 +3,4 @@ nvchecker:
   source: github
   use_latest_release: true
   prefix: v
-test: true
+test: trueoldver: 1.2.2.post2
