@@ -109,5 +109,5 @@ jobs:
           yaml=$(find config -name ${{ github.event.inputs.pkgbase }}.yaml)
           update-yaml $yaml ${{ github.event.inputs.pkgver }}
           git add $yaml
-          git commit -m "${{ github.event.inputs.pkgbase }}: auto updated to ${{ github.event.inputs.pkgver }}"
+          git commit -m "${{ github.event.inputs.pkgbase }}: auto updated to ${{ github.event.inputs.pkgver }}" || :
           git-push
