@@ -2,4 +2,5 @@ nvchecker:
   github: niksite/url-normalize
   source: github
   use_latest_release: true
-test: trueoldver: 1.4.3
+test: true
+oldver: 1.4.3
