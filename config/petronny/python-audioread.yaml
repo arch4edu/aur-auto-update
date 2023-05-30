@@ -2,6 +2,6 @@ nvchecker:
   github: beetbox/audioread
   source: github
   use_latest_tag: true
+  prefix: v
 test: true
-
 oldver: v3.0.0

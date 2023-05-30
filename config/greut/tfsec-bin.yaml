@@ -2,4 +2,5 @@ nvchecker:
   github: aquasecurity/tfsec
   source: github
   use_latest_tag: true
+  prefix: v
 test: true
