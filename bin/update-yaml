@@ -6,5 +6,5 @@ if [ -z "$(grep '^oldver: ' $yaml)" ]
 then
 	echo "oldver: $version" >> $yaml
 else
-	sed "/^oldver: /s/^.*$/oldver: $version" -i $yaml
+	sed "/^oldver: /s/^.*$/oldver: $version/" -i $yaml
 fi
