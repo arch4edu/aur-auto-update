@@ -1,4 +1,4 @@
 [__config__]
 newver = "/dev/null"
 oldver = "oldver.json"
-keyfile = "config/keyfile.toml"
+#keyfile = "config/keyfile.toml"

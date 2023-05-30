@@ -27,6 +27,7 @@ jobs:
       - name: Run nvchecker
         run: |
           sed "s/GITHUB_TOKEN/${{ secrets._GITHUB_TOKEN }}/" -i config/keyfile.toml
+          sed 's/#keyfile/keyfile/' -i config/__config__.toml
           python nvchecker.py
           set -o pipefail
           nvchecker --logger both -c nvchecker.toml > nvchecker.log

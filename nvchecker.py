@@ -10,8 +10,6 @@ import toml
 import yaml
 
 nvchecker_toml = toml.load("config/__config__.toml")
-if not 'GITHUB_TOKEN' in os.environ and 'keyfile' in nvchecker_toml['__config__']:
-    del nvchecker_toml['__config__']['keyfile']
 
 oldver = {}
 for i in [Path(j) for j in sys.argv[1:]] if len(sys.argv) > 1 else Path("config").rglob("*.yaml"):
