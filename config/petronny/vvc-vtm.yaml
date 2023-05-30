@@ -5,3 +5,5 @@ nvchecker:
   use_max_tag: true
   prefix: VTM-
 test: true
+
+oldver: 20.2
