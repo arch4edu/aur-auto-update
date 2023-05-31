@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+validpgpkeys=$(makepkg --printsrcinfo | sed -n '/validpgpkeys =/s/.*validpgpkeys = \([0-9A-F]*\)$/\1/p')
+for key in ${validpgpkeys[@]}; do
+  echo "Receiving key ${key}..."
+  # first check if the key is already received; if not try it twice
+  gpg --list-keys $key || gpg --recv-keys $key || gpg --recv-keys $key
+done
