@@ -19,7 +19,7 @@ for i in [Path(j) for j in sys.argv[1:]] if len(sys.argv) > 1 else Path("config"
         with open(i) as f:
             config = yaml.safe_load(f)
             if 'oldver' in config:
-                oldver[i.stem] = config['oldver']
+                oldver[i.stem] = str(config['oldver'])
             config = config["nvchecker"]
             config["user_agent"] = "nvchecker"
             nvchecker_toml[i.stem] = config
