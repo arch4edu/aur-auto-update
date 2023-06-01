@@ -49,7 +49,7 @@ jobs:
           aur-clone ${{ github.event.inputs.pkgbase }}
           cd ${{ github.event.inputs.pkgbase }}
           update-pkgver ${{ github.event.inputs.pkgver }} || exit 0
-          recv-gpg-keys || :
+          su makepkg -c recv-gpg-keys || :
           if [ -f /usr/bin/custom-x86_64-build ]
           then
             su makepkg -c custom-x86_64-build || :
