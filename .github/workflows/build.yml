@@ -26,9 +26,9 @@ jobs:
       - name: Install runtime dependencies
         run: pacman -S --noconfirm --needed base-devel devtools dbus git pacman-contrib
 
-      - uses: arch4edu/cactus/actions/config-makepkg@main
-
       - uses: actions/checkout@master
+
+      - uses: arch4edu/cactus/actions/config-makepkg@main
 
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
