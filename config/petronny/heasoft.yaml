@@ -3,3 +3,4 @@ nvchecker:
   source: regex
   url: https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html
 test: true
+oldver: 6.31.1
