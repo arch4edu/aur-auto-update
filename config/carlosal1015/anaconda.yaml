@@ -3,3 +3,4 @@ nvchecker:
   source: regex
   url: https://repo.anaconda.com/archive/
 test: true
+oldver: 2023.03
