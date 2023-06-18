@@ -4,4 +4,4 @@ nvchecker:
   use_latest_release: true
   prefix: v
 test: true
-oldver: 1.24.3
+oldver: 1.25.0
