@@ -1,8 +1,8 @@
 name: Check update
 
 on:
-  #schedule:
-  #  - cron: '53 7 * * *'
+  schedule:
+    - cron: '53 7 * * *'
   #push:
   #  branches:
   #    - main
