@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://lucene.apache.org/core/downloads.html
 test: true
-oldver: 9.6.0
+oldver: 9.7.0
