@@ -1,0 +1,4 @@
+nvchecker:
+  pypi: pygraphviz
+  source: pypi
+test: true
