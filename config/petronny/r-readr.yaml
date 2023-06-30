@@ -1,0 +1,5 @@
+nvchecker:
+  regex: readr_([\d.]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/readr/index.html
+test: true
