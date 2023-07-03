@@ -1,0 +1,5 @@
+nvchecker:
+  regex: pypy2.7-v([\d.]+).tar.bz2
+  source: regex
+  url: https://www.pypy.org/download.html
+test: true
