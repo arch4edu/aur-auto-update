@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://mumps-solver.org/index.php
 test: true
-oldver: 5.6.0
+oldver: 5.6.1
