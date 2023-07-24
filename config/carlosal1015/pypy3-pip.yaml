@@ -3,4 +3,4 @@ nvchecker:
   source: github
   use_max_tag: true
 test: true
-oldver: 23.2
+oldver: 23.2.1
