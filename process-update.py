@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import requests
 import sys
 import traceback
 from pathlib import Path
@@ -12,6 +13,7 @@ from github import Github
 
 token = toml.load("config/keyfile.toml")["keys"]["github"]
 github = Github(token)
+session = requests.Session()
 
 with open("nvchecker.log") as f:
     lines = f.readlines()
@@ -26,8 +28,11 @@ for line in lines:
             config = next(Path("config").rglob(f"{package}.yaml"))
             with open(config) as f:
                 config = yaml.safe_load(f)
-                flag = False if not "flag" in config else config["flag"]
-                test = False if not "test" in config else config["test"]
+            flag = False if not "flag" in config else config["flag"]
+            test = False if not "test" in config else config["test"]
+            if session.get(f'https://aur.archlinux.org/pkgbase/{package}').status_code == 404:
+                print(f"{package} doesn't exist on AUR.")
+                continue
             if test:
                 github.get_repo('arch4edu/aur-auto-update').get_workflow("build.yml").create_dispatch('main', {'pkgbase': package, 'pkgver': version})
                 print(f"Triggered build test for {package} {version}.")
