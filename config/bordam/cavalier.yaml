@@ -1,6 +1,6 @@
 nvchecker:
-  github: fsobolev/cavalier
+  github: NickvisionApps/cavalier
   source: github
   use_latest_release: true
 test: true
-oldver: 2023.01.29
+oldver: 2023.7.0
