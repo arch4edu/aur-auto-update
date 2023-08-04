@@ -5,4 +5,4 @@ nvchecker:
   from_pattern: '-'
   to_pattern: _
 test: true
-oldver: 2023.7.3
+oldver: 2023.8.0
