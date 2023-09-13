@@ -5,4 +5,4 @@ nvchecker:
   from_pattern: '-'
   to_pattern: _
 test: true
-oldver: 6.6.0.202305301015_r
+oldver: 6.7.0.202309050840_r
