@@ -17,10 +17,14 @@ jobs:
     container:
       image: archlinux
       options: --privileged
+      volumes:
+        - /:/ubuntu
     outputs:
       built: ${{ steps.export.outputs.built }}
 
     steps:
+      - uses: arch4edu/cactus/actions/clean-up-ubuntu@main
+
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
 
       - name: Install runtime dependencies
