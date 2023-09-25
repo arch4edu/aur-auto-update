@@ -1,4 +1,7 @@
 nvchecker:
-  github: OpenFOAM/OpenFOAM-10
+  github: OpenFOAM/OpenFOAM-11
   source: github
   use_latest_tag: true
+  prefix: 'version-'
+  from_pattern: '^'
+  to_pattern: '11.'
