@@ -5,3 +5,4 @@ nvchecker:
   prefix: 'version-'
   from_pattern: '^'
   to_pattern: '11.'
+oldver: 11.20230907
