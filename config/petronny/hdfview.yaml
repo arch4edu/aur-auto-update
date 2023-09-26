@@ -3,3 +3,4 @@ nvchecker:
   source: regex
   url: https://portal.hdfgroup.org/display/support/Download+HDFView
 test: true
+oldver: 3.3.1
