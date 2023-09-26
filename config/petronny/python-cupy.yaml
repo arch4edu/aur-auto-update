@@ -2,4 +2,5 @@ nvchecker:
   github: cupy/cupy
   source: github
   use_latest_release: true
+test: true
 oldver: 12.2.0
