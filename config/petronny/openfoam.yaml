@@ -3,7 +3,7 @@ nvchecker:
   source: github
   use_latest_tag: true
   prefix: 'version-'
-  from_pattern: '^'
+  from_pattern: r'^'
   to_pattern: '11.'
 test: true
 oldver: 11.20230907
