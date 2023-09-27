@@ -1,5 +1,5 @@
 nvchecker:
-  regex: Anaconda3-([\d.]+)-Linux-x86_64.sh
+  regex: Anaconda3-([\d.-]+)-Linux-x86_64.sh
   source: regex
   url: https://repo.anaconda.com/archive/
 test: true
