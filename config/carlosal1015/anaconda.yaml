@@ -2,5 +2,7 @@ nvchecker:
   regex: Anaconda3-([\d.-]+)-Linux-x86_64.sh
   source: regex
   url: https://repo.anaconda.com/archive/
+  from_pattern: '-'
+  to_pattern: .
 test: true
 oldver: 2023.03
