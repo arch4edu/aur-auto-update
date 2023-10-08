@@ -4,4 +4,4 @@ nvchecker:
   use_latest_tag: true
   prefix: v
 test: true
-oldver: 3.0.0
+oldver: 3.0.1
