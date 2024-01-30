@@ -4,4 +4,4 @@ nvchecker:
   use_latest_release: true
   prefix: multiprocess-
 test: true
-oldver: 0.70.15
+oldver: 0.70.16
