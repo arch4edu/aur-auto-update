@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://petsc.org/release/download/
 test: true
-oldver: 3.20.3
+oldver: 3.20.4
