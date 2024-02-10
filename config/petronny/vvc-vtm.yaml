@@ -6,4 +6,4 @@ nvchecker:
   prefix: VTM-
 test: true
 
-oldver: 23.0
+oldver: 23.1
