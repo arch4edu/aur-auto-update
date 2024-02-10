@@ -1,0 +1,6 @@
+nvchecker:
+  github: Aitum/obs-vertical-canvas
+  source: github
+  use_latest_release: true
+test: true
+oldver: 1.3.1
