@@ -1,0 +1,6 @@
+nvchecker:
+  source: "httpheader"
+  url: "https://api.wooting.io/public/wootility/download?os=linux"
+  regex: wootility-(3\.\d+\.\d+)\.AppImage
+test: true
+oldver: 3.6.16
