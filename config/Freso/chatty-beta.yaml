@@ -1,0 +1,8 @@
+nvchecker:
+  github: chatty/chatty
+  source: github
+  use_latest_tag: true
+  from_pattern: '[v-]'
+  to_pattern: ''
+test: true
+oldver: "0.26b5"
