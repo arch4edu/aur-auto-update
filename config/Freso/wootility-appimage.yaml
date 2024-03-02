@@ -3,4 +3,4 @@ nvchecker:
   url: "https://api.wooting.io/public/wootility/download?os=linux&branch=lekker"
   regex: wootility-lekker-(\d+\.\d+\.\d+)\.AppImage
 test: true
-oldver: 4.6.14
+oldver: 4.6.15
