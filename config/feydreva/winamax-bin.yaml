@@ -2,4 +2,3 @@ nvchecker:
   source: "htmlparser"
   url: "https://www.winamax.fr/jouer-au-poker?dl=1&platform=linux"
   xpath: '//meta[@http-equiv="refresh"]/@content'
-test: true
