@@ -20,7 +20,7 @@ jobs:
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
 
       - name: Install runtime dependencies
-        run: pacman -S --noconfirm --needed jq nvchecker python-packaging python-pygithub python-toml python-yaml
+        run: pacman -S --noconfirm --needed jq nvchecker python-lxml python-packaging python-pygithub python-toml python-yaml
 
       - uses: actions/checkout@master
 
