@@ -1,0 +1,6 @@
+nvchecker:
+  source: github
+  github: dimtpap/obs-pipewire-audio-capture
+  use_latest_release: true
+test: true
+oldver: "1.1.4"
