@@ -5,4 +5,4 @@ nvchecker:
   from_pattern: '[v-]'
   to_pattern: ''
 test: true
-oldver: 0.26b6
+oldver: 0.26
