@@ -1,5 +1,5 @@
 nvchecker:
-  github: rafatosta/zapzap
+  github: zapzap-linux/zapzap
   source: github
   use_latest_release: true
   prefix: v
