@@ -1,8 +1,0 @@
-nvchecker:
-  github: NickvisionApps/Parabolic
-  source: github
-  use_latest_release: true
-  from_pattern: '-'
-  to_pattern: _
-test: true
-oldver: 2023.8.3
