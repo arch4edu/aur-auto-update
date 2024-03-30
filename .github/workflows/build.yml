@@ -23,12 +23,12 @@ jobs:
       built: ${{ steps.export.outputs.built }}
 
     steps:
-      - uses: arch4edu/cactus/actions/clean-up-ubuntu@main
-
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
 
       - name: Install runtime dependencies
-        run: pacman -S --noconfirm --needed base-devel devtools dbus git pacman-contrib
+        run: pacman -S --noconfirm --needed arch-install-scripts base-devel devtools dbus git pacman-contrib
+
+      - uses: arch4edu/cactus/actions/clean-up-ubuntu@main
 
       - uses: actions/checkout@master
 
