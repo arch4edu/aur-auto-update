@@ -21,6 +21,7 @@ jobs:
         - /:/ubuntu
     outputs:
       built: ${{ steps.export.outputs.built }}
+      diff: ${{ steps.export.outputs.diff }}
 
     steps:
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
@@ -66,6 +67,7 @@ jobs:
         run: |
           cd ${{ github.event.inputs.pkgbase }}
           [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && echo "built=1" >> "$GITHUB_OUTPUT" || echo "built=0" >> "$GITHUB_OUTPUT"
+          echo "diff='$(git diff -- PKGBUILD | base64 -w 0)'" >> "$GITHUB_OUTPUT"
 
   push:
     needs: build
@@ -97,16 +99,11 @@ jobs:
           git config --global user.email 'auto-update-bot@arch4edu.org'
           useradd makepkg
 
-      - name: Override update script
-        run: |
-          find config -name ${{ github.event.inputs.pkgbase }}.override -exec cp {} bin/update-pkgver \;
-          chmod +x bin/update-pkgver
-
       - name: Push ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }} to AUR
         run: |
           aur-clone ${{ github.event.inputs.pkgbase }}
           cd ${{ github.event.inputs.pkgbase }}
-          update-pkgver ${{ github.event.inputs.pkgver }}
+          echo ${{ needs.build.outputs.diff }} | base64 -d | git apply
           aur-push
 
       - name: Update the oldver in yaml
