@@ -1,5 +1,5 @@
 #!/bin/sh
-newver=$(grep -P '^pkgver' PKGBUILD | cut -d= -f2)
+newver=$(grep -P '^pkgver=' PKGBUILD | cut -d= -f2)
 
 su makepkg -c 'makepkg --printsrcinfo' > .SRCINFO
 git add PKGBUILD .SRCINFO
