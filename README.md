@@ -8,12 +8,12 @@ Automatically update the PKGBUILD on AUR when there is a new version of a packag
 ## Quick guide
 
 * Add `AutoUpdateBot` as a co-maintainer of your package on AUR.
-* Add the corresponding [nvchecker](https://github.com/lilydjwg/nvchecker) configuration in [`nvchecker.toml`](https://github.com/arch4edu/aur-auto-update/blob/main/nvchecker.toml). You can locally test your newly added configuration with:
+* Add the corresponding [nvchecker](https://github.com/lilydjwg/nvchecker) configuration under `config`. You can locally test your newly added configuration with:
   ```sh
+  python nvchecker.py config/path/to/the_added_package.yaml
   nvchecker -c nvchecker.toml -e the_added_package
   ```
-* (Optional) Write the corresponding `update/${pkgbase}.sh` for your package if necessary.
-  * The default script `update/default.sh` will automatically strip the leading non-version characters, and is suitable for versions like `1.0.0`, `v1.0.0`, `version-1.0.0`.
+* (Optional) Write a custom update script to `config/path/to/the_added_package.override` to override `bin/update-pkgver` if necessary.
 * Create a pull request to submit your changes and pass the checks.
   * Remember to take a look at the check results.
 * Done. You can check the outputs of [GitHub Actions](https://github.com/arch4edu/aur-auto-update/actions) if there is anything wrong.
