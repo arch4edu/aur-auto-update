@@ -1,7 +1,0 @@
-nvchecker:
-  github: tkashkin/adwaita-for-steam
-  source: github
-  use_latest_release: true
-  prefix: v
-test: true
-oldver: 1.7
