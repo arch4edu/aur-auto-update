@@ -2,3 +2,4 @@ nvchecker:
   source: github
   github: zapzap-linux/zapzap
 test: true
+oldver: 20240317.144533
