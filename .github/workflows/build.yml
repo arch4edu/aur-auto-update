@@ -101,6 +101,7 @@ jobs:
 
       - name: Push ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }} to AUR
         run: |
+          [ -z ${{ needs.build.outputs.diff }} ] && exit 0
           aur-clone ${{ github.event.inputs.pkgbase }}
           cd ${{ github.event.inputs.pkgbase }}
           echo ${{ needs.build.outputs.diff }} | base64 -d | git apply
