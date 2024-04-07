@@ -1,0 +1,13 @@
+#!/bin/sh
+newver="$1" #Just input whatever nvchecker returns, it'll be never used.
+force="$2"
+
+if [ -z "${force}" ]; then
+  oldver=$(grep -P '^pkgver=' PKGBUILD | cut -d= -f2)
+  su makepkg -c 'makepkg -od --noprepare'
+  newver=$(grep -P '^pkgver=' PKGBUILD | cut -d= -f2)
+  [ $(vercmp "${oldver}" "${newver}") -eq 1 ] && echo "The oldver ${oldver} is greater than newver ${newver}." && exit 1
+  if [ "${oldver}" != "${newver}" ]; then
+    sed "s/^pkgrel=.*$/pkgrel=1/" -i PKGBUILD
+  fi
+fi
