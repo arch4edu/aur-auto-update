@@ -24,15 +24,15 @@ def convert_toml_to_yaml(toml_raw: IO,
     toml_parsed = toml.load(toml_raw)
     if len(toml_parsed.keys()) == 0:
         raise ValueError("Empty TOML file.")
-    if len(toml_parsed.keys()) > 1:
-        raise NotImplementedError("File contains multiple configurations which isn't handled yet.")
     yaml_dict = dict()
     for project in toml_parsed.keys():
-        yaml_dict["nvchecker"] = toml_parsed.get(project)
+        project_dict = dict()
+        project_dict["nvchecker"] = toml_parsed.get(project)
         if test is not None:
-            yaml_dict["test"] = test
+            project_dict["test"] = test
         if oldver is not None:
-            yaml_dict["oldver"] = oldver
+            project_dict["oldver"] = oldver
+        yaml_dict[project] = project_dict
     return yaml_dict
 
 
@@ -59,7 +59,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         argv = sys.argv[1:]
     args = parse_args(*argv)
     yaml_data = convert_toml_to_yaml(args.nvchecker_file, test=args.test, oldver=args.oldver)
-    print(yaml.dump(yaml_data))
+    for project, data in yaml_data.items():
+        with open(project + ".yaml", 'w') as outfile:
+            yaml.dump(data, outfile)
     return 0
 
 
