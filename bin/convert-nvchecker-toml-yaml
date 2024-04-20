@@ -63,10 +63,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     if not args.output_directory.is_dir():
         raise NotADirectoryError("{output} is not a directory.".format(output=args.output_directory))
     for file in args.nvchecker_files:
+        print("Processing {file}...".format(file=file.name))
         yaml_data = convert_toml_to_yaml(file, test=args.test)
         file.close()
         for project, data in yaml_data.items():
             outfile_path = args.output_directory / "{project}.yaml".format(project=project)
+            print("- Writing {path}".format(path=outfile_path))
             with open(outfile_path, 'w') as outfile:
                 yaml.dump(data, outfile)
     return 0
