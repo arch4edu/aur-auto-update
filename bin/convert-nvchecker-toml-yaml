@@ -19,11 +19,11 @@ import yaml
 
 
 def convert_toml_to_yaml(toml_raw: IO,
-                         test: Optional[bool] = None) -> dict:
+                         test: Optional[bool] = None) -> Optional[dict]:
     """Generate YAML data from provided TOML input."""
     toml_parsed = toml.load(toml_raw)
     if len(toml_parsed.keys()) == 0:
-        raise ValueError("Empty TOML file.")
+        return None
     yaml_dict = dict()
     for project in toml_parsed.keys():
         project_dict = dict()
@@ -66,6 +66,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("Processing {file}...".format(file=file.name))
         yaml_data = convert_toml_to_yaml(file, test=args.test)
         file.close()
+        if not yaml_data:
+            print("- Empty TOML file")  
+            continue
         for project, data in yaml_data.items():
             outfile_path = args.output_directory / "{project}.yaml".format(project=project)
             print("- Writing {path}".format(path=outfile_path))
