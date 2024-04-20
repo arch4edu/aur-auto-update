@@ -47,9 +47,10 @@ def parse_args(*argv: str) -> argparse.Namespace:
                         default=None,
                         action=argparse.BooleanOptionalAction,
                         type=bool)
-    parser.add_argument("nvchecker_file",
-                        help="the .nvchecker.toml file to convert",
+    parser.add_argument("nvchecker_files",
+                        help="the .nvchecker.toml file(s) to convert",
                         metavar=".nvchecker.toml",
+                        nargs="+",
                         type=argparse.FileType('rb'))
     return parser.parse_args(argv)
 
@@ -61,10 +62,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     args = parse_args(*argv)
     if not args.output_directory.is_dir():
         raise NotADirectoryError("{output} is not a directory.".format(output=args.output_directory))
-    yaml_data = convert_toml_to_yaml(args.nvchecker_file, test=args.test)
-    for project, data in yaml_data.items():
-        with open(args.output_directory / project + ".yaml", 'w') as outfile:
-            yaml.dump(data, outfile)
+    for file in args.nvchecker_files:
+        yaml_data = convert_toml_to_yaml(file, test=args.test)
+        file.close()
+        for project, data in yaml_data.items():
+            outfile_path = args.output_directory / "{project}.yaml".format(project=project)
+            with open(outfile_path, 'w') as outfile:
+                yaml.dump(data, outfile)
     return 0
 
 
