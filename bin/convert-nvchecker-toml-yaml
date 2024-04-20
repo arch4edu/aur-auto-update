@@ -72,6 +72,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         for project, data in yaml_data.items():
             outfile_path = args.output_directory / "{project}.yaml".format(project=project)
             print("- Writing {path}".format(path=outfile_path))
+            try:
+                with open(outfile_path, 'r') as outfile:
+                    data |= yaml.safe_load(outfile)
+            except IOError:
+                pass
             with open(outfile_path, 'w') as outfile:
                 yaml.safe_dump(data, outfile)
     return 0
