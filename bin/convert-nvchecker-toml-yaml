@@ -73,7 +73,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             outfile_path = args.output_directory / "{project}.yaml".format(project=project)
             print("- Writing {path}".format(path=outfile_path))
             with open(outfile_path, 'w') as outfile:
-                yaml.dump(data, outfile)
+                yaml.safe_dump(data, outfile)
     return 0
 
 
