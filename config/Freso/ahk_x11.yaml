@@ -1,0 +1,6 @@
+nvchecker:
+  github: phil294/AHK_X11
+  source: github
+  use_max_tag: true
+oldver: 1.0.3
+test: true
