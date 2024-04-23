@@ -4,3 +4,4 @@ nvchecker:
   source: pagure
   use_latest_release: true
 test: true
+oldver: 46.0
