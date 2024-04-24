@@ -2,6 +2,9 @@
 *.json
 *.sw*
 cache/
+__pycache__
 nvchecker.toml
 *.key
 *.txt
+test*.py
+*.pkl
