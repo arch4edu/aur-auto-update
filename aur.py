@@ -3,6 +3,17 @@ import re
 import requests
 import pickle
 
+class PackageInfo:
+
+    def __init__(self, info):
+        self.name = info['Name']
+        self.pkgbase = info['PackageBase']
+        self.last_modified = info['LastModified']
+        self.out_of_date = info['OutOfDate']
+
+    def __repr__(self):
+        return f'<PackageInfo {self.name}>'
+
 class AUR:
 
     base_url = 'https://aur.archlinux.org'
@@ -44,6 +55,13 @@ class AUR:
         response = self.session.get(url)
         assert response.status_code == 200
         return response.text
+
+    def search(self, by, keyword):
+        url = '/'.join([AUR.base_url, 'rpc', 'v5', 'search', keyword])
+        params = {'by': by}
+        response = self.session.get(url, params=params)
+        assert response.status_code == 200
+        return [PackageInfo(i) for i in response.json()['results']]
 
     def flag(self, package, comment):
         pass
