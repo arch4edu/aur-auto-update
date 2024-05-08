@@ -53,6 +53,7 @@ jobs:
         run: |
           aur-clone ${{ github.event.inputs.pkgbase }}
           cd ${{ github.event.inputs.pkgbase }}
+          chown makepkg:root -R .
           update-pkgver ${{ github.event.inputs.pkgver }} || exit 0
           su makepkg -c recv-gpg-keys || :
           if [ -f /usr/bin/custom-x86_64-build ]
@@ -61,27 +62,21 @@ jobs:
           else
             su makepkg -c extra-x86_64-build || :
           fi
+          su makepkg -c 'makepkg --printsrcinfo' > .SRCINFO
 
       - name: Export build result
         id: export
         run: |
           cd ${{ github.event.inputs.pkgbase }}
           [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && echo "built=1" >> "$GITHUB_OUTPUT" || echo "built=0" >> "$GITHUB_OUTPUT"
-          echo "diff='$(git diff -- PKGBUILD | base64 -w 0)'" >> "$GITHUB_OUTPUT"
+          echo "diff='$(git diff -- PKGBUILD .SRCINFO | base64 -w 0)'" >> "$GITHUB_OUTPUT"
 
   push:
     needs: build
     if: ${{ needs.build.outputs.built == 1 }}
     runs-on: ubuntu-latest
-    container:
-      image: archlinux
 
     steps:
-      - uses: arch4edu/cactus/actions/upgrade-archlinux@main
-
-      - name: Install runtime dependencies
-        run: pacman -S --noconfirm --needed base-devel git openssh pacman-contrib
-
       - uses: actions/checkout@master
         with:
           token: ${{ secrets._GITHUB_TOKEN }}
@@ -91,13 +86,12 @@ jobs:
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
 
-      - name: Configure git makepkg and ssh
+      - name: Configure git and ssh
         run: |
-          echo "${{ secrets.SSH_KEY }}" | install -Dm400 /dev/stdin /root/.ssh/aur
-          cp ssh_config /root/.ssh/config
+          echo "${{ secrets.SSH_KEY }}" | install -Dm400 /dev/stdin ~/.ssh/aur
+          cp ssh_config ~/.ssh/config
           git config --global user.name 'Auto update bot'
           git config --global user.email 'auto-update-bot@arch4edu.org'
-          useradd makepkg
 
       - name: Push ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }} to AUR
         run: |
