@@ -1,0 +1,6 @@
+nvchecker:
+  git: https://github.com/openSUSE/libeconf.git
+  include_regex: v((?:\d|\.)+)
+  prefix: v
+  source: git
+test: true

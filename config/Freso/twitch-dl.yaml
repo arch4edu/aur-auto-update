@@ -1,0 +1,5 @@
+nvchecker:
+  git: https://github.com/ihabunek/twitch-dl.git
+  include_regex: (\d(?:\d|\.)+)
+  source: git
+test: true
