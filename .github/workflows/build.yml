@@ -9,6 +9,10 @@ on:
         required: true
       pkgver:
         required: true
+      clean-up-ubuntu:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
 
@@ -30,6 +34,7 @@ jobs:
         run: pacman -S --noconfirm --needed arch-install-scripts base-devel devtools dbus git pacman-contrib
 
       - uses: arch4edu/cactus/actions/clean-up-ubuntu@main
+        if: ${{ github.event.inputs.clean-up-ubuntu == 'true' }}
 
       - uses: actions/checkout@master
 
