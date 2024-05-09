@@ -1,5 +1,5 @@
 nvchecker:
   source: github
-  github: zapzap-linux/zapzap
+  github: rafatosta/zapzap
 test: true
 oldver: 20240429.222723
