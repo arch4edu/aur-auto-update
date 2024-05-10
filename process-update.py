@@ -21,10 +21,10 @@ with open("nvchecker.log") as f:
 nvtake = []
 for line in lines:
     line = json.loads(line.strip("\n"))
-    package = line["name"]
     if line["event"] == "updated":
-        version = line["version"]
         try:
+            package = line["name"]
+            version = line["version"]
             config = next(Path("config").rglob(f"{package}.yaml"))
             with open(config) as f:
                 config = yaml.safe_load(f)
