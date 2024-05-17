@@ -2,5 +2,5 @@ nvchecker:
   git: https://github.com/Lurk/clink.git
   include_regex: ((?:\d|\.)+)
   source: git
-oldver: 0.7.1
+oldver: 0.8.0
 test: true
