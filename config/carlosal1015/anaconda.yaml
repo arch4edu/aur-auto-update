@@ -6,3 +6,4 @@ nvchecker:
   to_pattern: .
 test: true
 oldver: 2024.02.1
+clean-up-ubuntu: true
