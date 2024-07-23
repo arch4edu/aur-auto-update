@@ -1,0 +1,6 @@
+nvchecker:
+  github: an-anime-team/sleepy-launcher
+  source: github
+  use_latest_release: true
+test: true
+oldver: 1.0.0
