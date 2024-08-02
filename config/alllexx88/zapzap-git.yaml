@@ -2,4 +2,4 @@ nvchecker:
   source: github
   github: rafatosta/zapzap
 test: true
-oldver: 20240729.195439
+oldver: 20240801.135807
