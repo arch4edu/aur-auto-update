@@ -4,3 +4,4 @@ nvchecker:
   prefix: v
   source: git
 test: true
+oldver: 0.1.0
