@@ -3,3 +3,4 @@ nvchecker:
   include_regex: \d{4}\.\d{2}\.\d{2}
   source: git
 test: true
+oldver: 2024.07.18
