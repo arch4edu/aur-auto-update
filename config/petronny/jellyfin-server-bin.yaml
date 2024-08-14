@@ -1,5 +1,5 @@
 nvchecker:
-  regex: '>jellyfin-server_(.*)+deb12_amd64.deb'
+  regex: '>jellyfin-server_(.*)\+deb12_amd64.deb'
   source: regex
   url: https://repo.jellyfin.org/files/server/debian/latest-stable/amd64/
 test: true
