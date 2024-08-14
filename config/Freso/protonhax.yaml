@@ -1,0 +1,5 @@
+nvchecker:
+  git: https://github.com/jcnils/protonhax.git
+  include_regex: \d(?:\d|\.)+\d
+  source: git
+test: true
