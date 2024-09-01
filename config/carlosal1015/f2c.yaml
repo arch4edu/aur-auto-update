@@ -1,0 +1,6 @@
+nvchecker:
+  github: barak/f2c
+  source: github
+  use_max_tag: true
+  prefix: upstream
+test: true
