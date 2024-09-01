@@ -4,3 +4,4 @@ nvchecker:
   use_max_tag: true
   prefix: upstream
 test: true
+oldver: /20240504
