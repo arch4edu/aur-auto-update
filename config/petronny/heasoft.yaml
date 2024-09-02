@@ -4,3 +4,4 @@ nvchecker:
   url: https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html
 test: true
 oldver: 6.33.2
+clean-up-ubuntu: true
