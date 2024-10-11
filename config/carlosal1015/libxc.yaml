@@ -3,4 +3,4 @@ nvchecker:
   source: gitlab
   use_max_tag: true
 test: true
-oldver: 6.2.2
+oldver: 7.0.0
