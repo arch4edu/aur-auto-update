@@ -1,0 +1,7 @@
+nvchecker:
+  github: pycompression/python-zlib-ng
+  source: github
+  use_latest_tag: true
+  prefix: v
+test: true
+oldver: 0.5.0
