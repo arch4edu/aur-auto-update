@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://repo.jellyfin.org/files/server/debian/latest-stable/amd64/
 test: true
-oldver: 10.10.0
+oldver: 10.10.1
