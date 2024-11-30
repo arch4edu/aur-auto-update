@@ -1,0 +1,5 @@
+nvchecker:
+  npm: tiddlywiki
+  source: npm
+test: true
+oldver: 5.3.5
