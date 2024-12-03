@@ -1,0 +1,7 @@
+nvchecker:
+  git: https://github.com/chatty/chatty.git
+  include_regex: v((?:\d|\.)+)
+  prefix: v
+  source: git
+test: true
+oldver: 0.26

@@ -1,0 +1,8 @@
+nvchecker:
+  from_pattern: '[v-]'
+  git: https://github.com/chatty/chatty.git
+  include_regex: v((?:\d|\.)+(?:|-b\d+))
+  source: git
+  to_pattern: ''
+test: true
+oldver: 0.26
