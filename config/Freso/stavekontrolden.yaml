@@ -3,4 +3,4 @@ nvchecker:
   url: https://stavekontrolden.dk/?dictionaries=1
   regex: da_DK-(\d\.\d\.\d{3})\.oxt
 test: true
-oldver: 2.8.162
+oldver: 2.8.163
