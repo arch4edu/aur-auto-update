@@ -1,5 +1,0 @@
-nvchecker:
-  pypi: pygraphviz
-  source: pypi
-test: true
-oldver: 1.13
