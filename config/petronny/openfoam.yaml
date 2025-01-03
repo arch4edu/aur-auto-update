@@ -5,4 +5,4 @@ nvchecker:
   from_pattern: ^
   to_pattern: '12.'
 test: true
-oldver: 12.20240902
+oldver: 12.20250102
