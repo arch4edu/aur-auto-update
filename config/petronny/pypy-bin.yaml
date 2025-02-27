@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://www.pypy.org/download.html
 test: true
-oldver: 7.3.18
+oldver: 7.3.19
