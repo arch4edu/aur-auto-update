@@ -3,5 +3,5 @@ nvchecker:
   source: regex
   url: https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html
 test: true
-oldver: 6.34
+oldver: 6.35
 clean-up-ubuntu: true
