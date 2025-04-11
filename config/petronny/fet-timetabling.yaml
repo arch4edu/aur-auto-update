@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://lalescu.ro/liviu/fet/download.html
 test: true
-oldver: 7.1.3
+oldver: 7.1.4
