@@ -1,0 +1,99 @@
+#!/bin/python
+# SPDX-FileType: SOURCE
+# SPDX-FileType: APPLICATION
+# SPDX-FileCopyrightText: © 2024 Frederik “Freso” S. Olesen <https://freso.dk/>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+"""Convert .nvchecker.toml files to YAML for use with aur-auto-update."""
+
+import argparse
+import sys
+
+try:
+    import tomllib as toml
+except ImportError:
+    import toml
+
+from pathlib import Path
+from typing import Optional, IO
+
+import yaml
+
+
+def convert_toml_to_yaml(toml_raw: IO, test: Optional[bool] = None) -> Optional[dict]:
+    """Generate YAML data from provided TOML input."""
+    toml_parsed = toml.load(toml_raw)
+    if len(toml_parsed.keys()) == 0:
+        return None
+    yaml_dict = dict()
+    for project in toml_parsed.keys():
+        project_dict = dict()
+        project_dict["nvchecker"] = toml_parsed.get(project)
+        if test is not None:
+            project_dict["test"] = test
+        yaml_dict[project] = project_dict
+    return yaml_dict
+
+
+def parse_args(*argv: str) -> argparse.Namespace:
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output-directory",
+        "-o",
+        help="directory to output YAML file(s) to; defaults to current directory",
+        default=".",
+        type=Path,
+    )
+    parser.add_argument(
+        "--test",
+        help=(
+            "include `test` key in YAML output (true; use --no-test for false)); "
+            "applies to all resulting files"
+        ),
+        default=None,
+        action=argparse.BooleanOptionalAction,
+        type=bool,
+    )
+    parser.add_argument(
+        "nvchecker_files",
+        help="the .nvchecker.toml file(s) to convert",
+        metavar=".nvchecker.toml",
+        nargs="+",
+        type=argparse.FileType("rb"),
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    """Read arguments from commandline and print out YAML data on stdout."""
+    if argv is None:
+        argv = sys.argv[1:]
+    args = parse_args(*argv)
+    if not args.output_directory.is_dir():
+        raise NotADirectoryError(
+            "{output} is not a directory.".format(output=args.output_directory)
+        )
+    for file in args.nvchecker_files:
+        print("Processing {file}...".format(file=file.name))
+        yaml_data = convert_toml_to_yaml(file, test=args.test)
+        file.close()
+        if not yaml_data:
+            print("- Empty TOML file")
+            continue
+        for project, data in yaml_data.items():
+            outfile_path = args.output_directory / "{project}.yaml".format(
+                project=project
+            )
+            print("- Writing {path}".format(path=outfile_path))
+            try:
+                with open(outfile_path, "r") as outfile:
+                    data |= yaml.safe_load(outfile)
+            except IOError:
+                pass
+            with open(outfile_path, "w") as outfile:
+                yaml.safe_dump(data, outfile)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
