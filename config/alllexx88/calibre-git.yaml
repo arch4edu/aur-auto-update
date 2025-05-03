@@ -1,0 +1,4 @@
+nvchecker:
+  source: github
+  github: kovidgoyal/calibre
+test: true
