@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: http://meteothink.org/downloads/index.html
 test: true
-oldver: 4.0.1
+oldver: 4.0.2
