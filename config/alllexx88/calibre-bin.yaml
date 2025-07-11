@@ -4,4 +4,4 @@ nvchecker:
   use_latest_release: true
   prefix: v
 test: true
-oldver: 8.5.0
+oldver: 8.6.0
