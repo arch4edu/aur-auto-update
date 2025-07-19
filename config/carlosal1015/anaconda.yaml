@@ -5,5 +5,5 @@ nvchecker:
   from_pattern: '-'
   to_pattern: .
 test: true
-oldver: 2025.06.0
+oldver: 2025.06.1
 clean-up-ubuntu: true
