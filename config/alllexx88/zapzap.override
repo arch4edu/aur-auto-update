@@ -1,0 +1,17 @@
+#!/bin/sh
+newver=$(echo "$1" | sed -e 's/\-/~/g')
+force="$2"
+
+if [ -z "${force}"]
+then
+	oldver=$(grep -P '^pkgver' PKGBUILD | cut -d= -f2)
+	[ $(vercmp "${oldver}" "${newver}") -eq 1 ] && echo "The oldver ${oldver} is greater than newver ${newver}." && exit 1
+fi
+
+if [ "${oldver}" != "${newver}" ]
+then
+	sed "s/^pkgver=.*$/pkgver=${newver}/" -i PKGBUILD
+	sed "s/^pkgrel=.*$/pkgrel=1/" -i PKGBUILD
+fi
+
+su makepkg -c 'updpkgsums'
