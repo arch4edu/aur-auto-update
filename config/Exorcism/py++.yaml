@@ -1,0 +1,6 @@
+nvchecker:
+  github: ompl/pyplusplus
+  source: github
+  use_max_tag: true
+test: true
+oldver: 1.8.7

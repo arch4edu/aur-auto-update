@@ -1,0 +1,7 @@
+nvchecker:
+  github: vxgmichel/aioconsole
+  source: github
+  use_max_tag: true
+  prefix: v
+test: true
+oldver: 0.8.1
