@@ -1,7 +1,0 @@
-nvchecker:
-  github: xiaoyeli/superlu_dist
-  source: github
-  use_latest_release: true
-  prefix: v
-test: true
-oldver: 9.1.0
