@@ -1,7 +1,0 @@
-nvchecker:
-  github: 10110111/CalcMySky
-  source: github
-  use_latest_release: true
-  prefix: v
-test: true
-oldver: 0.3.4
