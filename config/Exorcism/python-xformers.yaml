@@ -1,0 +1,7 @@
+nvchecker:
+  github: facebookresearch/xformers
+  source: github
+  use_max_tag: true
+  prefix: v
+test: true
+oldver: 0.0.32.post2
