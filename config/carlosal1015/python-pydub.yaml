@@ -1,7 +1,0 @@
-nvchecker:
-  github: jiaaro/pydub
-  source: github
-  use_latest_release: true
-  prefix: v
-test: true
-oldver: 0.25.1
