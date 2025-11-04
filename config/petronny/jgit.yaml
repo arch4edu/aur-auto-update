@@ -1,8 +1,9 @@
 nvchecker:
-  regex: Direct Download ([\d.]+.*)</h2>
-  source: regex
-  url: http://www.eclipse.org/jgit/download/
+  github: eclipse-jgit/jgit
+  source: github
+  use_max_tag: true
   from_pattern: '-'
   to_pattern: _
+  prefix: v
 test: true
 oldver: 7.0.0.202409031743_r
