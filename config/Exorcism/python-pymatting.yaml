@@ -1,0 +1,7 @@
+nvchecker:
+  github: pymatting/pymatting
+  source: github
+  use_max_tag: true
+  prefix: v
+test: true
+oldver: 1.1.13
