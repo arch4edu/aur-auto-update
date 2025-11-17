@@ -1,0 +1,5 @@
+nvchecker:
+  github: phil294/AHK_X11
+  source: github
+  use_latest_release: true
+test: true
