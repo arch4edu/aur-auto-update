@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: http://res.bsmart.it.s3.amazonaws.com/mybsmart_desktop/releases/production_v2/linux/latest-deb-x64.yml
 test: true
-oldver: 7.6.5
+oldver: 7.6.6
