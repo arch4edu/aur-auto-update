@@ -3,4 +3,4 @@ nvchecker:
   source: github
   use_latest_release: true
 test: true
-oldver: 5.1
+oldver: 5.2
