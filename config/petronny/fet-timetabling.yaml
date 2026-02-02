@@ -1,5 +1,5 @@
 nvchecker:
-  regex: fet-([\d.]+).tar.bz2
+  regex: fet-([\d.]+).tar.xz
   source: regex
   url: https://lalescu.ro/liviu/fet/download.html
 test: true
