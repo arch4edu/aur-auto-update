@@ -1,6 +1,0 @@
-nvchecker:
-  regex: files/MeteoInfo_([\d.]+).zip
-  source: regex
-  url: http://meteothink.org/downloads/index.html
-test: true
-oldver: 4.1.4
