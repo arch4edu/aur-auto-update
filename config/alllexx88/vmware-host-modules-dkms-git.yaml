@@ -3,3 +3,4 @@ nvchecker:
   github: mkubecek/vmware-host-modules
   branch: workstation-17.5.1
 test: true
+oldver: 20240112.073033
