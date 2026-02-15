@@ -279,9 +279,9 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
             elif push_conclusion and push_conclusion != 'success':
                 status = "🚫 Push failed"
                 push_failed_count += 1
-            # 3e. Build succeeded, push succeeded -> Fully successful (regardless of AUR status)
+            # 3e. Build succeeded, push succeeded -> Success (regardless of AUR status)
             else:
-                status = "📦 Fully successful"
+                status = "📦 Success"
                 fully_successful_count += 1
 
         display_name = pkg if len(pkg) <= pkg_width - 3 else pkg[:pkg_width - 6] + "..."
@@ -306,7 +306,6 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         status_parts.append(f"🚫{push_failed_count}")
     summary = " ".join(status_parts)
     print(f"Total: {total} packages ({summary})")
-    print("="*total_width)
 
 def main():
     try:
