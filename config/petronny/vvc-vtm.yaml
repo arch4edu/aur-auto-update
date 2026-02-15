@@ -7,4 +7,4 @@ nvchecker:
   include_regex: '^VTM-(\d+\.\d+)$'
 test: true
 
-oldver: 23.4
+oldver: 23.14
