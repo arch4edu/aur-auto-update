@@ -95,24 +95,47 @@ def query_aur_packages(package_names: List[str]) -> Dict[str, tuple]:
         print(f"  AUR query failed: {e}")
         return {}
 
-def get_error_message(run_id: str) -> str:
+def get_run_info(run_id: str) -> dict:
+    """一次 log 调用，同时解析 build error 和 push conclusion"""
     try:
-        output = run_gh_command(['run', 'view', str(run_id), '--log'])
-        error_lines = []
-        for line in output.split('\n'):
-            if '==> ERROR:' in line:
-                error_text = line.split('==> ERROR:')[1].strip()
-                if error_text:
-                    error_lines.append(error_text)
-            elif 'is greater than newver' in line:
-                error_text = line.strip()
-                if error_text:
-                    error_lines.append(error_text)
-        if error_lines:
-            return '; '.join(error_lines[:2])
-        return "No==>ERRORerrors"
+        log_output = run_gh_command(['run', 'view', str(run_id), '--log'])
+        lines = log_output.split('\n')
+
+        build_error = "No==>ERRORerrors"
+        push_conclusion = ''
+        in_push_job = False
+        push_job_seen = False
+
+        for line in lines:
+            # Build error detection
+            if build_error == "No==>ERRORerrors":
+                if '==> ERROR:' in line:
+                    error_text = line.split('==> ERROR:')[1].strip()
+                    if error_text:
+                        build_error = error_text
+                elif 'is greater than newver' in line:
+                    error_text = line.strip()
+                    if error_text:
+                        build_error = error_text
+
+            # Push job detection & conclusion
+            if line.startswith('push\t'):
+                in_push_job = True
+                push_job_seen = True
+            elif line.startswith('build\t'):
+                in_push_job = False
+            elif line.startswith('##[error]') and in_push_job:
+                push_conclusion = 'failure'
+                # 不 break，继续收集 build_error（如果还没找到）
+
+        # 如果 push job 存在且未发现 error，视为 success
+        if push_job_seen and not push_conclusion:
+            push_conclusion = 'success'
+
+        return {'build_error': build_error, 'push_conclusion': push_conclusion}
     except Exception as e:
-        return f"Failed to get log: {str(e)}"
+        print(f"   Error getting run info for {run_id}: {e}")
+        return {'build_error': f"Failed: {e}", 'push_conclusion': ''}
 
 def get_manual_fix_commits_since(check_time: datetime) -> set:
     """检查 check_time 之后的提交，找出修改了 config/ 目录下文件的提交，从中提取包名"""
@@ -200,15 +223,14 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
     print("-"*total_width)
 
     total = len(build_runs)
-    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫 ⚪
+    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫
     fully_successful_count = 0  # 📦
     fixed_count = 0             # ✅
     aur_updated_count = 0       # 🟢
     not_maintained_count = 0    # ⚫
     vercmp_failed_count = 0     # 🟡
     build_failed_count = 0      # ❌
-    not_updated_aur_count = 0   # 🚫
-    no_aur_data_count = 0       # ⚪
+    push_failed_count = 0       # 🚫
 
     for build in build_runs:
         pkg = build['package']
@@ -222,32 +244,25 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
             is_co_maintainer = False
             aur_success = False
 
-        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫 ⚪
-        # Minimize get_error_message calls
+        # 获取 run 信息（build error 和 push conclusion），自动缓存
+        run_info = get_run_info(run_id)
+        build_error = run_info['build_error']
+        push_conclusion = run_info['push_conclusion']
+        build_failed = build_error != "No==>ERRORerrors"
+        vercmp_failed = "is greater than newver" in build_error.lower()
 
-        # New logic:
-        # 1. Batch check fixed (all packages)
-        # 2. If fixed -> ✅ Fixed (overrides other statuses, including non-maintained)
-        # 3. Else if not co-maintainer -> ⚫ No longer maintained
-        # 4. Else (maintainer and not fixed) -> always get error_msg, then:
-        #    - vercmp failed -> 🟡 vercmp failed
-        #    - build_failed -> ❌ Build failed
-        #    - no error -> check AUR status: 📦 / 🚫 / ⚪
+        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫
 
-        # 1. Fixed check (highest priority, applies to all)
+        # 1. Fixed
         if pkg in fixed_packages:
             status = "✅ Fixed"
             fixed_count += 1
-        # 2. Non-co-maintainer (only if not fixed)
+        # 2. Non-co-maintainer
         elif not is_co_maintainer:
             status = "⚫ No longer maintained"
             not_maintained_count += 1
-        # 3. Co-maintainer without fix: always get error message
+        # 3. Co-maintainer: evaluate
         else:
-            error_msg = get_error_message(run_id)
-            build_failed = error_msg != "No==>ERRORerrors"
-            vercmp_failed = "is greater than newver" in error_msg.lower()
-
             # 3a. vercmp failed
             if vercmp_failed:
                 status = "🟡 vercmp failed"
@@ -256,21 +271,18 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
             elif build_failed and aur_success:
                 status = "🟢 AUR updated"
                 aur_updated_count += 1
-            # 3c. Build failed and AUR not updated -> ❌
+            # 3c. Build failed -> ❌
             elif build_failed:
                 status = "❌ Build failed"
                 build_failed_count += 1
-            # 3d. No build error: check AUR status
+            # 3d. Push failed -> 🚫
+            elif push_conclusion and push_conclusion != 'success':
+                status = "🚫 Push failed"
+                push_failed_count += 1
+            # 3e. Build succeeded, push succeeded -> Fully successful (regardless of AUR status)
             else:
-                if aur_success:
-                    status = "📦 Fully successful"
-                    fully_successful_count += 1
-                elif aur_time:
-                    status = "🚫 Not updated on AUR"
-                    not_updated_aur_count += 1
-                else:
-                    status = "⚪ No AUR data"
-                    no_aur_data_count += 1
+                status = "📦 Fully successful"
+                fully_successful_count += 1
 
         display_name = pkg if len(pkg) <= pkg_width - 3 else pkg[:pkg_width - 6] + "..."
         print(f"{display_name:<{pkg_width}} {run_id:<{run_id_width}} {status:<{status_width}}")
@@ -290,10 +302,8 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         status_parts.append(f"🟡{vercmp_failed_count}")
     if build_failed_count > 0:
         status_parts.append(f"❌{build_failed_count}")
-    if not_updated_aur_count > 0:
-        status_parts.append(f"🚫{not_updated_aur_count}")
-    if no_aur_data_count > 0:
-        status_parts.append(f"⚪{no_aur_data_count}")
+    if push_failed_count > 0:
+        status_parts.append(f"🚫{push_failed_count}")
     summary = " ".join(status_parts)
     print(f"Total: {total} packages ({summary})")
     print("="*total_width)
