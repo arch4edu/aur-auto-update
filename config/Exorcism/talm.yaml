@@ -1,0 +1,6 @@
+nvchecker:
+  github: cozystack/talm
+  source: github
+  use_max_tag: true
+  prefix: v
+test: true
