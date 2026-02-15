@@ -2,6 +2,7 @@
 
 import subprocess
 import json
+import os
 import urllib.request
 from datetime import datetime, timezone
 from typing import List, Dict
@@ -113,64 +114,189 @@ def get_error_message(run_id: str) -> str:
     except Exception as e:
         return f"Failed to get log: {str(e)}"
 
+def get_manual_fix_commits_since(check_time: datetime) -> set:
+    """检查 check_time 之后的提交，找出修改了 config/ 目录下文件的提交，从中提取包名"""
+    print("🔍 Checking for fixed packages by post-check commits...")
+    try:
+        # 使用 git log 查找 check_time 之后的提交，格式：<hash> <author> <date> <subject>
+        since_time = check_time.strftime('%Y-%m-%d %H:%M:%S')
+        result = subprocess.run(
+            ['git', 'log', f'--since={since_time}', '--format=%H %an %ai %s', '--name-only'],
+            cwd='/home/petron/auto_update_bot/aur-auto-update',
+            capture_output=True, text=True, check=False
+        )
+        lines = result.stdout.split('\n')
+        fixed_packages = set()
+        current_commit_files = []
+        in_files_section = False
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            # 如果行不以空格开头，且不是空行，是新的 commit 头
+            if not line.startswith(' ') and '\t' not in line:
+                # 处理上一个提交的文件列表
+                if current_commit_files:
+                    fixed_packages.update(extract_packages_from_paths(current_commit_files))
+                    current_commit_files = []
+                # 解析新 commit 头：检查作者排除 GitHub Actions
+                parts = line.split(' ', 3)
+                if len(parts) >= 4:
+                    commit_hash, author, date, subject = parts
+                    if is_github_action_author(author):
+                        in_files_section = False  # 跳过此提交的文件
+                        continue
+                in_files_section = True
+            elif in_files_section and line:
+                # 这是文件路径
+                current_commit_files.append(line)
+
+        # 处理最后一个提交
+        if current_commit_files:
+            fixed_packages.update(extract_packages_from_paths(current_commit_files))
+
+        print(f"   Found {len(fixed_packages)} fixed packages: {sorted(fixed_packages)}")
+        return fixed_packages
+    except Exception as e:
+        print(f"   Error checking commits: {e}")
+        return set()
+
+def is_github_action_author(author: str) -> bool:
+    """判断是否为 GitHub Actions 提交"""
+    return author == "GitHub Actions" or 'github-actions[bot]' in author
+
+def extract_packages_from_paths(paths: List[str]) -> set:
+    """从文件路径列表中提取包名（config/<maintainer>/<pkg>.yaml）"""
+    packages = set()
+    for path in paths:
+        # 只处理 config/ 目录下的 yaml 文件
+        if not (path.startswith('config/') and path.endswith('.yaml')):
+            continue
+        parts = path.split('/')
+        if len(parts) >= 3:
+            pkg_file = parts[-1]  # <pkg>.yaml
+            pkg_name = pkg_file[:-5] if pkg_file.endswith('.yaml') else pkg_file
+            packages.add(pkg_name)
+    return packages
+
 def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_time: datetime):
-    print("\n" + "="*120)
+    # Get manual fix commits since check time
+    fixed_packages = get_manual_fix_commits_since(check_time)
+
+    # Calculate dynamic column widths (no AURUpdate column)
+    all_packages = [build['package'] for build in build_runs]
+    max_pkg_len = max(len(pkg) for pkg in all_packages) if all_packages else 0
+    pkg_width = min(max_pkg_len + 2, 40)  # +2 padding, max 40
+    run_id_width = 12
+    status_width = 20
+    total_width = pkg_width + run_id_width + status_width + 2  # 2 spaces between columns
+
+    print("\n" + "="*total_width)
     print("📊 AUR Auto-Update Build Results")
-    print("="*120)
-    print(f"{'Package':<40} {'Run ID':<12} {'AURUpdate':<20} {'Status':<20}")
-    print("-"*120)
+    print("="*total_width)
+    header = f"{'Package':<{pkg_width}} {'Run ID':<{run_id_width}} {'Status':<{status_width}}"
+    print(header)
+    print("-"*total_width)
+
     total = len(build_runs)
-    success_count = 0
-    fail_count = 0
-    aur_not_updated_count = 0
-    not_maintained_count = 0
-    downgrade_count = 0
+    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫 ⚪
+    fully_successful_count = 0  # 📦
+    fixed_count = 0             # ✅
+    aur_updated_count = 0       # 🟢
+    not_maintained_count = 0    # ⚫
+    vercmp_failed_count = 0     # 🟡
+    build_failed_count = 0      # ❌
+    not_updated_aur_count = 0   # 🚫
+    no_aur_data_count = 0       # ⚪
+
     for build in build_runs:
         pkg = build['package']
         run_id = build['run_id']
         aur_data = aur_info.get(pkg)
         if aur_data:
             aur_time, is_co_maintainer = aur_data
-            aur_time_str = aur_time.strftime('%Y-%m-%d %H:%M')
+            aur_success = aur_time > check_time if aur_time else False
         else:
-            aur_time_str = "Unknown"
+            aur_time = None
             is_co_maintainer = False
-        if not is_co_maintainer:
+            aur_success = False
+
+        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫 ⚪
+        # Minimize get_error_message calls
+
+        # New logic:
+        # 1. Batch check fixed (all packages)
+        # 2. If fixed -> ✅ Fixed (overrides other statuses, including non-maintained)
+        # 3. Else if not co-maintainer -> ⚫ No longer maintained
+        # 4. Else (maintainer and not fixed) -> always get error_msg, then:
+        #    - vercmp failed -> 🟡 vercmp failed
+        #    - build_failed -> ❌ Build failed
+        #    - no error -> check AUR status: 📦 / 🚫 / ⚪
+
+        # 1. Fixed check (highest priority, applies to all)
+        if pkg in fixed_packages:
+            status = "✅ Fixed"
+            fixed_count += 1
+        # 2. Non-co-maintainer (only if not fixed)
+        elif not is_co_maintainer:
             status = "⚫ No longer maintained"
             not_maintained_count += 1
-            fail_count += 1
+        # 3. Co-maintainer without fix: always get error message
         else:
             error_msg = get_error_message(run_id)
             build_failed = error_msg != "No==>ERRORerrors"
-            downgrade_rejected = "greater than newver" in error_msg.lower()
-            if downgrade_rejected:
-                status = "⚠️ Upgrade failed (downgrade)"
-                downgrade_count += 1
-                fail_count += 1
+            vercmp_failed = "is greater than newver" in error_msg.lower()
+
+            # 3a. vercmp failed
+            if vercmp_failed:
+                status = "🟡 vercmp failed"
+                vercmp_failed_count += 1
+            # 3b. Build failed but AUR updated -> 🟢
+            elif build_failed and aur_success:
+                status = "🟢 AUR updated"
+                aur_updated_count += 1
+            # 3c. Build failed and AUR not updated -> ❌
             elif build_failed:
                 status = "❌ Build failed"
-                fail_count += 1
+                build_failed_count += 1
+            # 3d. No build error: check AUR status
             else:
-                aur_success = aur_time and aur_time > check_time
                 if aur_success:
-                    status = "✅ Fully successful"
-                    success_count += 1
+                    status = "📦 Fully successful"
+                    fully_successful_count += 1
                 elif aur_time:
-                    status = "🟡 Not updated on AUR"
-                    aur_not_updated_count += 1
+                    status = "🚫 Not updated on AUR"
+                    not_updated_aur_count += 1
                 else:
                     status = "⚪ No AUR data"
-                    fail_count += 1
-        display_name = pkg if len(pkg) <= 38 else pkg[:35] + "..."
-        print(f"{display_name:<40} {run_id:<12} {aur_time_str:<20} {status:<20}")
-    print("="*120)
-    print(f"Total: {total} packages")
-    print(f"  ✅ Fully successful: {success_count}")
-    print(f"  ❌ Build failed: {fail_count}")
-    print(f"  🟡 Not updated on AUR: {aur_not_updated_count}")
-    print(f"  ⚫ No longer maintained: {not_maintained_count}")
-    print(f"  ⚠️  Upgrade failed (downgrade): {downgrade_count}")
-    print("="*120)
+                    no_aur_data_count += 1
+
+        display_name = pkg if len(pkg) <= pkg_width - 3 else pkg[:pkg_width - 6] + "..."
+        print(f"{display_name:<{pkg_width}} {run_id:<{run_id_width}} {status:<{status_width}}")
+
+    print("="*total_width)
+    # Build summary string with only non-zero counts in priority order
+    status_parts = []
+    if fully_successful_count > 0:
+        status_parts.append(f"📦{fully_successful_count}")
+    if fixed_count > 0:
+        status_parts.append(f"✅{fixed_count}")
+    if aur_updated_count > 0:
+        status_parts.append(f"🟢{aur_updated_count}")
+    if not_maintained_count > 0:
+        status_parts.append(f"⚫{not_maintained_count}")
+    if vercmp_failed_count > 0:
+        status_parts.append(f"🟡{vercmp_failed_count}")
+    if build_failed_count > 0:
+        status_parts.append(f"❌{build_failed_count}")
+    if not_updated_aur_count > 0:
+        status_parts.append(f"🚫{not_updated_aur_count}")
+    if no_aur_data_count > 0:
+        status_parts.append(f"⚪{no_aur_data_count}")
+    summary = " ".join(status_parts)
+    print(f"Total: {total} packages ({summary})")
+    print("="*total_width)
 
 def main():
     try:
