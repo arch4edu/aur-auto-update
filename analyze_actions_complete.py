@@ -65,35 +65,33 @@ def query_aur_packages(package_names: List[str]) -> Dict[str, tuple]:
     for pkg in package_names:
         query_parts.append(f"arg[]={urllib.request.quote(pkg)}")
     url = f"https://aur.archlinux.org/rpc/?{'&'.join(query_parts)}"
-    try:
-        with urllib.request.urlopen(url, timeout=30) as response:
-            data = json.loads(response.read().decode())
-            aur_info = {}
-            bot_identifiers = ['AutoUpdateBot', 'auto-update-bot@arch4edu.org', 'arch4edu']
-            for pkg_info in data.get('results', []):
-                name = pkg_info.get('Name')
-                last_modified = pkg_info.get('LastModified')
-                maintainer = pkg_info.get('Maintainer', '')
-                comaintainers = pkg_info.get('CoMaintainers', [])
-                if name and last_modified:
-                    is_co_maintainer = False
-                    all_maintainers = [maintainer] + comaintainers
-                    for maint in all_maintainers:
-                        for bot_id in bot_identifiers:
-                            if bot_id in maint:
-                                is_co_maintainer = True
-                                break
-                        if is_co_maintainer:
+    with urllib.request.urlopen(url, timeout=30) as response:
+        data = json.loads(response.read().decode())
+        aur_info = {}
+        bot_identifiers = ['AutoUpdateBot', 'auto-update-bot@arch4edu.org', 'arch4edu']
+        for pkg_info in data.get('results', []):
+            name = pkg_info.get('Name')
+            last_modified = pkg_info.get('LastModified')
+            maintainer = pkg_info.get('Maintainer') or ''
+            comaintainers = pkg_info.get('CoMaintainers') or []
+            if name and last_modified:
+                is_co_maintainer = False
+                all_maintainers = [maintainer] + comaintainers
+                for maint in all_maintainers:
+                    if not maint:
+                        continue
+                    for bot_id in bot_identifiers:
+                        if bot_id in maint:
+                            is_co_maintainer = True
                             break
-                    aur_info[name] = (
-                        datetime.fromtimestamp(last_modified, tz=timezone.utc),
-                        is_co_maintainer
-                    )
-            print(f"   Successfully retrieved AUR info for {len(aur_info)}/{len(package_names)} packages")
-            return aur_info
-    except Exception as e:
-        print(f"  AUR query failed: {e}")
-        return {}
+                    if is_co_maintainer:
+                        break
+                aur_info[name] = (
+                    datetime.fromtimestamp(last_modified, tz=timezone.utc),
+                    is_co_maintainer
+                )
+        print(f"   Successfully retrieved AUR info for {len(aur_info)}/{len(package_names)} packages")
+        return aur_info
 
 def get_run_info(run_id: str) -> dict:
     """一次 log 调用，同时解析 build error 和 push conclusion"""
@@ -105,6 +103,8 @@ def get_run_info(run_id: str) -> dict:
         push_conclusion = ''
         in_push_job = False
         push_job_seen = False
+        dep_error_lines = []  # 收集包含依赖错误的行
+        dep_specific_lines = []  # 更具体的依赖错误（ pacman 的）
 
         for line in lines:
             # Build error detection
@@ -118,6 +118,16 @@ def get_run_info(run_id: str) -> dict:
                     if error_text:
                         build_error = error_text
 
+            # Collect dependency-related errors (only from ==> ERROR: lines)
+            if '==> ERROR:' in line:
+                error_text = line.split('==> ERROR:')[1].strip()
+                if any(keyword in error_text.lower() for keyword in [
+                    'failed to install missing dependencies',
+                    'could not resolve all dependencies',
+                ]):
+                    dep_specific_lines.append(error_text)
+                    dep_error_lines.append(error_text)  # also add to general
+
             # Push job detection & conclusion
             if line.startswith('push\t'):
                 in_push_job = True
@@ -126,7 +136,12 @@ def get_run_info(run_id: str) -> dict:
                 in_push_job = False
             elif line.startswith('##[error]') and in_push_job:
                 push_conclusion = 'failure'
-                # 不 break，继续收集 build_error（如果还没找到）
+
+        # 优先使用更具体的 pacman 依赖错误
+        if dep_specific_lines:
+            build_error = dep_specific_lines[0]
+        elif dep_error_lines:
+            build_error = dep_error_lines[0]
 
         # 如果 push job 存在且未发现 error，视为 success
         if push_job_seen and not push_conclusion:
@@ -223,11 +238,12 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
     print("-"*total_width)
 
     total = len(build_runs)
-    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫
+    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🔴 🟡 ❌ 🚫
     fully_successful_count = 0  # 📦
     fixed_count = 0             # ✅
     aur_updated_count = 0       # 🟢
     not_maintained_count = 0    # ⚫
+    dependency_issue_count = 0  # 🔴
     vercmp_failed_count = 0     # 🟡
     build_failed_count = 0      # ❌
     push_failed_count = 0       # 🚫
@@ -251,7 +267,7 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         build_failed = build_error != "No==>ERRORerrors"
         vercmp_failed = "is greater than newver" in build_error.lower()
 
-        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 ❌ 🚫
+        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 🔴 ❌ 🚫
 
         # 1. Fixed
         if pkg in fixed_packages:
@@ -267,19 +283,27 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
             if vercmp_failed:
                 status = "🟡 vercmp failed"
                 vercmp_failed_count += 1
-            # 3b. Build failed but AUR updated -> 🟢
+            # 3b. Dependency issue - pacman dependency resolution failures
+            # Only detect specific pacman errors: 'failed to install missing dependencies' and 'could not resolve all dependencies'
+            elif build_failed and any(keyword in build_error.lower() for keyword in [
+                'failed to install missing dependencies',
+                'could not resolve all dependencies',
+            ]):
+                status = "🔴 Dependency issue"
+                dependency_issue_count += 1
+            # 3c. Build failed but AUR updated -> 🟢
             elif build_failed and aur_success:
                 status = "🟢 AUR updated"
                 aur_updated_count += 1
-            # 3c. Build failed -> ❌
+            # 3d. Build failed -> ❌
             elif build_failed:
                 status = "❌ Build failed"
                 build_failed_count += 1
-            # 3d. Push failed -> 🚫
+            # 3e. Push failed -> 🚫
             elif push_conclusion and push_conclusion != 'success':
                 status = "🚫 Push failed"
                 push_failed_count += 1
-            # 3e. Build succeeded, push succeeded -> Success (regardless of AUR status)
+            # 3f. Build succeeded, push succeeded -> Success (regardless of AUR status)
             else:
                 status = "📦 Success"
                 fully_successful_count += 1
@@ -300,6 +324,8 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         status_parts.append(f"⚫{not_maintained_count}")
     if vercmp_failed_count > 0:
         status_parts.append(f"🟡{vercmp_failed_count}")
+    if dependency_issue_count > 0:
+        status_parts.append(f"🔴{dependency_issue_count}")
     if build_failed_count > 0:
         status_parts.append(f"❌{build_failed_count}")
     if push_failed_count > 0:
