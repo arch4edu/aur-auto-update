@@ -157,9 +157,10 @@ def get_manual_fix_commits_since(check_time: datetime) -> set:
     print("🔍 Checking for fixed packages by post-check commits...")
     try:
         # 使用 git log 查找 check_time 之后的提交，格式：<hash>|<author>|<date>|<subject>
-        since_time = check_time.strftime('%Y-%m-%d %H:%M:%S')
+        # 注意：git log --since 使用 ISO 8601 UTC 时间（以 Z 结尾），确保跨时区一致性
+        since_time_utc = check_time.strftime('%Y-%m-%dT%H:%M:%SZ')
         result = subprocess.run(
-            ['git', 'log', f'--since={since_time}', '--format=%H|%an|%ai|%s', '--name-only'],
+            ['git', 'log', f'--since={since_time_utc}', '--format=%H|%an|%ai|%s', '--name-only'],
             cwd='/home/petron/auto_update_bot/aur-auto-update',
             capture_output=True, text=True, check=False
         )
