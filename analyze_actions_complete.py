@@ -156,10 +156,10 @@ def get_manual_fix_commits_since(check_time: datetime) -> set:
     """检查 check_time 之后的提交，找出修改了 config/ 目录下文件的提交，从中提取包名"""
     print("🔍 Checking for fixed packages by post-check commits...")
     try:
-        # 使用 git log 查找 check_time 之后的提交，格式：<hash> <author> <date> <subject>
+        # 使用 git log 查找 check_time 之后的提交，格式：<hash>|<author>|<date>|<subject>
         since_time = check_time.strftime('%Y-%m-%d %H:%M:%S')
         result = subprocess.run(
-            ['git', 'log', f'--since={since_time}', '--format=%H %an %ai %s', '--name-only'],
+            ['git', 'log', f'--since={since_time}', '--format=%H|%an|%ai|%s', '--name-only'],
             cwd='/home/petron/auto_update_bot/aur-auto-update',
             capture_output=True, text=True, check=False
         )
@@ -169,26 +169,26 @@ def get_manual_fix_commits_since(check_time: datetime) -> set:
         in_files_section = False
 
         for line in lines:
-            line = line.strip()
-            if not line:
+            line_stripped = line.strip()
+            if not line_stripped:
                 continue
-            # 如果行不以空格开头，且不是空行，是新的 commit 头
-            if not line.startswith(' ') and '\t' not in line:
+            # 使用 | 分隔符判断是否为 commit 头
+            if '|' in line:
                 # 处理上一个提交的文件列表
                 if current_commit_files:
                     fixed_packages.update(extract_packages_from_paths(current_commit_files))
                     current_commit_files = []
-                # 解析新 commit 头：检查作者排除 GitHub Actions
-                parts = line.split(' ', 3)
+                # 解析新 commit 头：格式 <hash>|<author>|<date>|<subject>
+                parts = line.split('|', 3)
                 if len(parts) >= 4:
                     commit_hash, author, date, subject = parts
                     if is_github_action_author(author):
                         in_files_section = False  # 跳过此提交的文件
                         continue
                 in_files_section = True
-            elif in_files_section and line:
-                # 这是文件路径
-                current_commit_files.append(line)
+            elif in_files_section and line_stripped:
+                # 这是文件路径（不包含 |）
+                current_commit_files.append(line_stripped)
 
         # 处理最后一个提交
         if current_commit_files:
