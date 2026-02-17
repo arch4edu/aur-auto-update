@@ -3,4 +3,5 @@ nvchecker:
   source: github
   use_max_tag: true
   prefix: testcontainers-v
+  include_regex: '^testcontainers-v[0-9.]+$'
 test: true
