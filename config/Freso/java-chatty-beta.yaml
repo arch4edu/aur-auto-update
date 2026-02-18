@@ -5,4 +5,4 @@ nvchecker:
   source: git
   to_pattern: ''
 test: true
-oldver: 0.26
+oldver: 0.28
