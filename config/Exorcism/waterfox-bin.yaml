@@ -1,5 +1,5 @@
 nvchecker:
   github: BrowserWorks/waterfox
   source: github
-  use_max_tag: true
+  use_latest_release: true
 test: true
