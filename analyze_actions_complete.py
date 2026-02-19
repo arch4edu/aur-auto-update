@@ -3,6 +3,7 @@
 import subprocess
 import json
 import os
+import re
 import urllib.request
 from datetime import datetime, timezone
 from typing import List, Dict
@@ -93,8 +94,58 @@ def query_aur_packages(package_names: List[str]) -> Dict[str, tuple]:
         print(f"   Successfully retrieved AUR info for {len(aur_info)}/{len(package_names)} packages")
         return aur_info
 
+def get_check_run_info(run_id: str) -> dict:
+    """解析 check-update run 日志，提取 aur_missing 和 nvchecker_failed 的包集合"""
+    try:
+        log_output = run_gh_command(['run', 'view', str(run_id), '--log'])
+        lines = log_output.split('\n')
+        
+        aur_missing_packages = set()
+        nvchecker_failed_packages = set()
+        in_process_updates = False
+        
+        for line in lines:
+            # 检测 Process updates 步骤
+            if 'Process updates' in line and 'python process-update.py' in line:
+                in_process_updates = True
+                continue
+            elif in_process_updates and line.startswith('update	'):
+                # 解析 "doesn't exist on AUR"
+                if "doesn't exist on AUR" in line:
+                    # 格式: "update	Process updates	HH:MM:SS.mmsZ python-librosa doesn't exist on AUR."
+                    parts = line.split()
+                    # 查找包名（通常在 "doesn't exist" 之前）
+                    for i, part in enumerate(parts):
+                        if "doesn't" in part or "exist" in part:
+                            if i > 0:
+                                pkg = parts[i-1]
+                                aur_missing_packages.add(pkg)
+                            break
+                # 解析 "Failed to check update for <pkg>: event=..."
+                elif "Failed to check update for" in line:
+                    # 格式: "update	Process updates	HH:MM:SS.mmsZ Failed to check update for twitch-dl: event=running cmd."
+                    # 提取包名
+                    import re
+                    match = re.search(r'Failed to check update for (\S+):', line)
+                    if match:
+                        pkg = match.group(1)
+                        # 排除 event=running cmd 的情况（已被 process-update 忽略）
+                        if "event=running cmd" not in line:
+                            nvchecker_failed_packages.add(pkg)
+                # 检测是否离开 Process updates 步骤
+                elif line.startswith('update	Post Run'):
+                    in_process_updates = False
+        
+        return {
+            'aur_missing': aur_missing_packages,
+            'nvchecker_failed': nvchecker_failed_packages
+        }
+    except Exception as e:
+        print(f"   Error getting check run info for {run_id}: {e}")
+        return {'aur_missing': set(), 'nvchecker_failed': set()}
+
 def get_run_info(run_id: str) -> dict:
-    """一次 log 调用，同时解析 build error 和 push conclusion"""
+    """一次 log 调用，同时解析 build error、push conclusion"""
     try:
         log_output = run_gh_command(['run', 'view', str(run_id), '--log'])
         lines = log_output.split('\n')
@@ -219,9 +270,17 @@ def extract_packages_from_paths(paths: List[str]) -> set:
             packages.add(pkg_name)
     return packages
 
-def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_time: datetime):
+def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_time: datetime, check_run_id: str):
     # Get manual fix commits since check time
     fixed_packages = get_manual_fix_commits_since(check_time)
+    
+    # 从 check-update run 中获取每个包的额外状态（aur_missing, nvchecker_failed）
+    print("🔍 Analyzing check-update run for aur_missing and nvchecker_failed states...")
+    check_run_info = get_check_run_info(check_run_id)
+    aur_missing_packages = check_run_info.get('aur_missing', set())
+    nvchecker_failed_packages = check_run_info.get('nvchecker_failed', set())
+    print(f"   Found {len(aur_missing_packages)} packages missing on AUR")
+    print(f"   Found {len(nvchecker_failed_packages)} packages with nvchecker failures")
 
     # Calculate dynamic column widths (no AURUpdate column)
     all_packages = [build['package'] for build in build_runs]
@@ -239,7 +298,7 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
     print("-"*total_width)
 
     total = len(build_runs)
-    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🔴 🟡 ❌ 🚫
+    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🔴 🟡 ❌ 🚫 ⬜ ⚠️
     fully_successful_count = 0  # 📦
     fixed_count = 0             # ✅
     aur_updated_count = 0       # 🟢
@@ -248,6 +307,8 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
     vercmp_failed_count = 0     # 🟡
     build_failed_count = 0      # ❌
     push_failed_count = 0       # 🚫
+    aur_missing_count = 0       # ⬜
+    nvchecker_failed_count = 0  # ⚠️
 
     for build in build_runs:
         pkg = build['package']
@@ -268,7 +329,7 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         build_failed = build_error != "No==>ERRORerrors"
         vercmp_failed = "is greater than newver" in build_error.lower()
 
-        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 🔴 ❌ 🚫
+        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 🔴 ❌ 🚫 ⬜ ⚠️
 
         # 1. Fixed
         if pkg in fixed_packages:
@@ -278,33 +339,40 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         elif not is_co_maintainer:
             status = "⚫ No longer maintained"
             not_maintained_count += 1
-        # 3. Co-maintainer: evaluate
+        # 3. AUR missing (check-update 环节发现包不在 AUR)
+        elif pkg in aur_missing_packages:
+            status = "⬜ AUR missing"
+            aur_missing_count += 1
+        # 4. nvchecker failed (check-update 环节检查失败)
+        elif pkg in nvchecker_failed_packages:
+            status = "⚠️ nvchecker failed"
+            nvchecker_failed_count += 1
+        # 5. Co-maintainer: evaluate build results
         else:
-            # 3a. vercmp failed
+            # 5a. vercmp failed
             if vercmp_failed:
                 status = "🟡 vercmp failed"
                 vercmp_failed_count += 1
-            # 3b. Dependency issue - pacman dependency resolution failures
-            # Only detect specific pacman errors: 'failed to install missing dependencies' and 'could not resolve all dependencies'
+            # 5b. Dependency issue
             elif build_failed and any(keyword in build_error.lower() for keyword in [
                 'failed to install missing dependencies',
                 'could not resolve all dependencies',
             ]):
                 status = "🔴 Dependency issue"
                 dependency_issue_count += 1
-            # 3c. Build failed but AUR updated -> 🟢
+            # 5c. Build failed but AUR updated -> 🟢
             elif build_failed and aur_success:
                 status = "🟢 AUR updated"
                 aur_updated_count += 1
-            # 3d. Build failed -> ❌
+            # 5d. Build failed -> ❌
             elif build_failed:
                 status = "❌ Build failed"
                 build_failed_count += 1
-            # 3e. Push failed -> 🚫
+            # 5e. Push failed -> 🚫
             elif push_conclusion and push_conclusion != 'success':
                 status = "🚫 Push failed"
                 push_failed_count += 1
-            # 3f. Build succeeded, push succeeded -> Success (regardless of AUR status)
+            # 5f. Build succeeded, push succeeded -> Success
             else:
                 status = "📦 Success"
                 fully_successful_count += 1
@@ -369,7 +437,7 @@ def main():
         build_data.sort(key=lambda x: x['package'])
         
         aur_info = query_aur_packages(package_names)
-        process_builds(build_data, aur_info, check_time)
+        process_builds(build_data, aur_info, check_time, check_run_id)
     except Exception as e:
         print(f"\n❌ Script execution failed: {e}")
         import traceback
