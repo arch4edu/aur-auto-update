@@ -43,7 +43,7 @@ for line in lines:
             with open(config) as f:
                 config = yaml.safe_load(f)
             flag = False if not "flag" in config else config["flag"]
-            test = False if not "test" in config else config["test"]
+            test = True if not "test" in config else config["test"]
             if session.get(f'https://aur.archlinux.org/pkgbase/{package}').status_code == 404:
                 print(f"{package} doesn't exist on AUR.")
                 continue
