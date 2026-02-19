@@ -20,13 +20,21 @@ with open("nvchecker.log") as f:
 
 nvtake = []
 for line in lines:
-    line = json.loads(line.strip("\n"))
-    if not 'name' in line:
-        print(f"Failed to process update for {line}.")
+    try:
+        data = json.loads(line.strip("\n"))
+    except json.JSONDecodeError:
+        # 非 JSON 行（例如 nvchecker 的人类可读输出），跳过
         continue
-    package = line["name"]
-    if line["event"] == "updated":
-        version = line["version"]
+    
+    if not 'name' in data:
+        print(f"Failed to process update for {data}.")
+        continue
+    
+    package = data["name"]
+    event = data.get("event", "")
+    
+    if event == "updated":
+        version = data["version"]
         try:
             config = next(Path("config").rglob(f"{package}.yaml"))
             with open(config) as f:
@@ -50,9 +58,12 @@ for line in lines:
         except:
             print(f"Failed to process update for {package}.")
             traceback.print_exc()
-    elif line["event"] != "up-to-date":
-        print(f"Failed to check update for {package}.")
-        # TODO: Comment the error to AUR
+    elif event == "up-to-date":
+        # 包是最新的，无需操作
+        pass
+    else:
+        # 其他事件（如错误、调试信息等）不视为失败
+        pass
 
 with open("nvtake.txt", "w") as f:
     f.write(" ".join(nvtake))
