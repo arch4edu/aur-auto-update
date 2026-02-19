@@ -1,2 +1,2 @@
 [keys]
-github.com = "GITHUB_TOKEN"
+"github.com" = "GITHUB_TOKEN"

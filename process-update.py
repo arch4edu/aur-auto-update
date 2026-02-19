@@ -11,7 +11,7 @@ import toml
 import yaml
 from github import Github
 
-token = toml.load("config/keyfile.toml")["keys"]["github"]
+token = toml.load("config/keyfile.toml")["keys"]["github.com"]
 github = Github(token)
 session = requests.Session()
 
