@@ -1,7 +1,0 @@
-nvchecker:
-  github: cupy/cupy
-  source: github
-  use_latest_release: true
-  prefix: v
-test: true
-oldver: 13.5.1
