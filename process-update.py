@@ -33,6 +33,9 @@ for line in lines:
     package = data["name"]
     event = data.get("event", "")
     
+    if event in ["running cmd"]:
+        continue
+    
     if event == "updated":
         version = data["version"]
         try:
@@ -62,8 +65,8 @@ for line in lines:
         # 包是最新的，无需操作
         pass
     else:
-        # 其他事件（如错误、调试信息等）不视为失败
-        pass
+        # 其他事件（如 error、warning 等）视为失败，记录事件类型
+        print(f"Failed to check update for {package}: event={event}.")
 
 with open("nvtake.txt", "w") as f:
     f.write(" ".join(nvtake))
