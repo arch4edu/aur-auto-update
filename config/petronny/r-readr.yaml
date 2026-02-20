@@ -3,4 +3,4 @@ nvchecker:
   source: regex
   url: https://cran.r-project.org/web/packages/readr/index.html
 test: true
-oldver: 2.1.6
+oldver: 2.2.0
