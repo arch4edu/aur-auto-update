@@ -2,4 +2,5 @@ nvchecker:
   github: BrowserWorks/waterfox
   source: github
   use_max_tag: true
+  include_regex: '^[0-9.]+$'
 test: true
