@@ -3,4 +3,4 @@ nvchecker:
   include_regex: (\d(?:\d|\.)+)
   source: git
 test: true
-oldver: 3.3.1
+out_of_date: 1771200580
