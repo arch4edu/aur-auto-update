@@ -1,4 +1,4 @@
-# Auto update bot [![AUR auto update](https://github.com/arch4edu/aur-auto-update/actions/workflows/check-update.yml/badge.svg)](https://github.com/arch4edu/aur-auto-update/actions/workflows/check-update.yml)
+# Auto update bot [![AUR auto update](https://github.com/arch4edu/aur-auto-update/actions/workflows/check-update.yml/badge.svg)](https://github.com/arch4edu/aur-auto-update/actions/workflows/check-update.yml) [![DeepWiki](https://deepwiki.com/badge-maker?url=https%3A%2F%2Fdeepwiki.com%2Farch4edu%2Faur-auto-update)](https://deepwiki.com/arch4edu/aur-auto-update)
 Automatically update the PKGBUILD on AUR when there is a new version of a package.
 
 ## Warning
