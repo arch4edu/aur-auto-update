@@ -4,3 +4,4 @@ nvchecker:
   use_max_tag: true
   include_regex: '^[0-9.]+$'
 test: true
+oldver: 6.6.8
