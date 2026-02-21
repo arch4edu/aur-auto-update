@@ -6,7 +6,10 @@ import os
 import re
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, Dict
+
+import yaml
 
 def run_gh_command(args: List[str]) -> str:
     result = subprocess.run(['gh'] + args, capture_output=True, text=True, check=True)
@@ -89,7 +92,8 @@ def query_aur_packages(package_names: List[str]) -> Dict[str, tuple]:
                         break
                 aur_info[name] = (
                     datetime.fromtimestamp(last_modified, tz=timezone.utc),
-                    is_co_maintainer
+                    is_co_maintainer,
+                    pkg_info.get('OutOfDate')  # 可能为 0 或 None
                 )
         print(f"   Successfully retrieved AUR info for {len(aur_info)}/{len(package_names)} packages")
         return aur_info
@@ -298,9 +302,10 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
     print("-"*total_width)
 
     total = len(build_runs)
-    # Status counts in FINAL ORDER: 📦 ✅ 🟢 ⚫ 🔴 🟡 ❌ 🚫 ⬜ ⚠️
+    # Status counts in FINAL ORDER: 📦 ✅ 🚩 🟢 ⚫ 🟡 🔴 ❌ 🚫 ⬜ ⚠️
     fully_successful_count = 0  # 📦
     fixed_count = 0             # ✅
+    flagged_count = 0           # 🚩
     aur_updated_count = 0       # 🟢
     not_maintained_count = 0    # ⚫
     dependency_issue_count = 0  # 🔴
@@ -315,12 +320,13 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         run_id = build['run_id']
         aur_data = aur_info.get(pkg)
         if aur_data:
-            aur_time, is_co_maintainer = aur_data
+            aur_time, is_co_maintainer, aur_out_of_date = aur_data
             aur_success = aur_time > check_time if aur_time else False
         else:
             aur_time = None
             is_co_maintainer = False
             aur_success = False
+            aur_out_of_date = None
 
         # 获取 run 信息（build error 和 push conclusion），自动缓存
         run_info = get_run_info(run_id)
@@ -329,12 +335,36 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         build_failed = build_error != "No==>ERRORerrors"
         vercmp_failed = "is greater than newver" in build_error.lower()
 
-        # Priority order: 📦 ✅ 🟢 ⚫ 🟡 🔴 ❌ 🚫 ⬜ ⚠️
+        # 检查 flagged 状态（配置中的 out_of_date 与 AUR 的 OutOfDate 接近）
+        flagged = False
+        try:
+            # 查找对应 config 文件
+            config_path_candidates = list(Path("config").rglob(f"{pkg}.yaml"))
+            if config_path_candidates:
+                config_path = config_path_candidates[0]
+                with open(config_path) as f:
+                    config = yaml.safe_load(f) or {}
+                local_out_of_date = config.get('out_of_date')
+                # aur_out_of_date 可能为 None 或 0（未标记）
+                if local_out_of_date and aur_out_of_date and aur_out_of_date > 0:
+                    # 计算时间差（绝对值，单位秒）
+                    time_diff = abs(local_out_of_date - aur_out_of_date)
+                    if time_diff < 300:  # 5分钟内
+                        flagged = True
+        except Exception as e:
+            # 出错则忽略，不影响其他状态判断
+            flagged = False
+
+        # Priority order: 📦 ✅ 🚩 🟢 ⚫ 🟡 🔴 ❌ 🚫 ⬜ ⚠️
 
         # 1. Fixed
         if pkg in fixed_packages:
             status = "✅ Fixed"
             fixed_count += 1
+        # 1b. Flagged (插入到 Fixed 之后)
+        elif flagged:
+            status = "🚩 Flagged"
+            flagged_count += 1
         # 2. Non-co-maintainer
         elif not is_co_maintainer:
             status = "⚫ No longer maintained"
@@ -387,6 +417,8 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
         status_parts.append(f"📦{fully_successful_count}")
     if fixed_count > 0:
         status_parts.append(f"✅{fixed_count}")
+    if flagged_count > 0:
+        status_parts.append(f"🚩{flagged_count}")
     if aur_updated_count > 0:
         status_parts.append(f"🟢{aur_updated_count}")
     if not_maintained_count > 0:
