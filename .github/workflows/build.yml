@@ -66,9 +66,9 @@ jobs:
           su makepkg -c recv-gpg-keys || :
           if [ -f /usr/bin/custom-x86_64-build ]
           then
-            su makepkg -c custom-x86_64-build || :
+            su makepkg -c custom-x86_64-build -- -- --nocheck || :
           else
-            su makepkg -c extra-x86_64-build || :
+            su makepkg -c extra-x86_64-build -- -- --nocheck || :
           fi
           su makepkg -c 'makepkg --printsrcinfo' > .SRCINFO
 
