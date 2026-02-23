@@ -5,3 +5,4 @@ nvchecker:
   source: git
 test: true
 out_of_date: 1771309865
+oldver: 0.8.3
