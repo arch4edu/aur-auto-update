@@ -5,3 +5,4 @@ nvchecker:
   prefix: testcontainers-v
   include_regex: '^testcontainers-v[0-9.]+$'
 test: true
+oldver: 4.14.1
