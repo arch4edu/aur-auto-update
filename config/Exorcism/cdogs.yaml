@@ -1,0 +1,6 @@
+nvchecker:
+  github: cxong/cdogs-sdl
+  source: github
+  use_max_tag: true
+  include_regex: '^[0-9.]+$'
+test: true
