@@ -4,5 +4,5 @@ nvchecker:
   use_max_tag: true
   prefix: v
 test: true
-oldver: 4.4.4
+oldver: 4.4.8
 out_of_date: 1771309883
