@@ -5,4 +5,5 @@ nvchecker:
   from_pattern: ^
   to_pattern: '12.'
 test: true
+repository: arch4edu
 oldver: 12.20250206

@@ -3,4 +3,5 @@ nvchecker:
   source: regex
   url: https://cran.r-project.org/web/packages/readr/index.html
 test: true
+repository: arch4edu
 oldver: 2.2.0
