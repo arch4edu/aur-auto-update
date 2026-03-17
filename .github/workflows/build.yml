@@ -53,8 +53,8 @@ jobs:
           # Try yaml-based repository configuration first
           YAML=$(find config -name "${{ github.event.inputs.pkgbase }}.yaml" | head -n1)
           if [ -n "$YAML" ]; then
-            REPO=$(yq eval '.repository // empty' "$YAML")
-            if [ -n "$REPO" ]; then
+            REPO=$(yq -r '.repository // empty' "$YAML")
+            if [ -n "$REPO" ] && [ "$REPO" != "empty" ]; then
               CONF="trusted-repository/${REPO}.conf"
               if [ -f "$CONF" ]; then
                 cat /usr/share/devtools/pacman.conf.d/extra.conf "$CONF" > /usr/share/devtools/pacman.conf.d/custom.conf
