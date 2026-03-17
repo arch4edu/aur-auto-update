@@ -1,8 +1,0 @@
-nvchecker:
-  github: danielgatis/rembg
-  source: github
-  use_max_tag: true
-  prefix: v
-test: true
-repository: arch4edu
-oldver: 2.0.67
