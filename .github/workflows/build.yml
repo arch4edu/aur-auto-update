@@ -31,7 +31,7 @@ jobs:
       - uses: arch4edu/cactus/actions/upgrade-archlinux@main
 
       - name: Install runtime dependencies
-        run: pacman -S --noconfirm --needed arch-install-scripts base-devel devtools dbus git pacman-contrib
+        run: pacman -S --noconfirm --needed arch-install-scripts base-devel devtools dbus git pacman-contrib yq
 
       - uses: arch4edu/cactus/actions/clean-up-ubuntu@main
         if: ${{ github.event.inputs.clean-up-ubuntu == 'true' }}
@@ -50,9 +50,24 @@ jobs:
 
       - name: Configure custom repository
         run: |
+          # Try yaml-based repository configuration first
+          YAML=$(find config -name "${{ github.event.inputs.pkgbase }}.yaml" | head -n1)
+          if [ -n "$YAML" ]; then
+            REPO=$(yq -r '.repository // empty' "$YAML")
+            if [ -n "$REPO" ] && [ "$REPO" != "empty" ]; then
+              CONF="trusted-repository/${REPO}.conf"
+              if [ -f "$CONF" ]; then
+                cat /usr/share/devtools/pacman.conf.d/extra.conf "$CONF" > /usr/share/devtools/pacman.conf.d/custom.conf
+                ln -sf /usr/bin/archbuild /usr/bin/custom-x86_64-build
+                exit 0
+              fi
+            fi
+          fi
+          
+          # Fallback to original .repository logic
           [ -z "$(find config -name ${{ github.event.inputs.pkgbase }}.repository)" ] && exit 0
           cat /usr/share/devtools/pacman.conf.d/extra.conf $(find config -name ${{ github.event.inputs.pkgbase }}.repository) > /usr/share/devtools/pacman.conf.d/custom.conf
-          ln -s /usr/bin/archbuild /usr/bin/custom-x86_64-build
+          ln -sf /usr/bin/archbuild /usr/bin/custom-x86_64-build
 
       - name: Collect telemetry
         uses: petronny/workflow-telemetry-action@quickchart

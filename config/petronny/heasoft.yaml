@@ -3,5 +3,6 @@ nvchecker:
   source: regex
   url: https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html
 test: true
+repository: arch4edu
 oldver: 6.36
 clean-up-ubuntu: true
