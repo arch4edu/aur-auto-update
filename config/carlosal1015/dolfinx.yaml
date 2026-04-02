@@ -5,3 +5,4 @@ nvchecker:
   prefix: v
 test: true
 oldver: 0.10.0.post5
+repository: arch4edu

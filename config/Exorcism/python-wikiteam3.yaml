@@ -6,3 +6,4 @@ nvchecker:
 test: true
 oldver: 4.4.8
 out_of_date: 1771309883
+repository: arch4edu

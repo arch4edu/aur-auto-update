@@ -4,3 +4,4 @@ nvchecker:
   use_latest_release: true
 test: true
 oldver: 2024.1.0
+repository: arch4edu
