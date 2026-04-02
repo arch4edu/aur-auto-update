@@ -1,0 +1,5 @@
+nvchecker:
+  source: archpkg
+  archpkg: wxwidgets-gtk3
+  strip_release: true
+test: true
