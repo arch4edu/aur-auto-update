@@ -3,3 +3,4 @@ nvchecker:
   archpkg: wxwidgets-gtk3
   strip_release: true
 test: true
+repository: arch4edu
