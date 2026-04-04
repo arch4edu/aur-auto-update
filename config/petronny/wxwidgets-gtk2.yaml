@@ -4,3 +4,4 @@ nvchecker:
   strip_release: true
 test: true
 repository: arch4edu
+oldver: 3.2.10
