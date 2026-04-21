@@ -2,4 +2,4 @@ nvchecker:
   npm: tiddlywiki
   source: npm
 test: true
-oldver: 5.3.8
+oldver: 5.4.0
