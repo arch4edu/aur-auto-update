@@ -3,5 +3,5 @@ nvchecker:
   source: github
   use_max_tag: true
 test: true
-oldver: 26.0.1
+oldver: 26.1
 repository: arch4edu
