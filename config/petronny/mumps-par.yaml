@@ -4,4 +4,4 @@ nvchecker:
   url: https://mumps-solver.org/index.php
 test: true
 repository: arch4edu
-oldver: 5.8.2
+oldver: 5.9.0
