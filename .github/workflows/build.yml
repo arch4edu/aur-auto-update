@@ -94,6 +94,12 @@ jobs:
           [ -n "$(find -maxdepth 1 -name '*.pkg.tar.zst')" ] && echo "built=1" >> "$GITHUB_OUTPUT" || echo "built=0" >> "$GITHUB_OUTPUT"
           echo "diff='$(git diff -- PKGBUILD .SRCINFO | base64 -w 0)'" >> "$GITHUB_OUTPUT"
 
+      - name: Clean up pacman cache
+        if: always()
+        run: |
+          find /var/cache/pacman/pkg -maxdepth 1 -type d -regex '.*/download-[0-9a-zA-Z]\{6\}' -delete || :
+          find /var/cache/pacman/pkg -maxdepth 1 -type f -name 'download-*' -delete || :
+
   push:
     needs: build
     if: ${{ needs.build.outputs.built == 1 }}

@@ -36,3 +36,9 @@ jobs:
         run: |
           python process-update.py
           [ -f nvtake.txt ] && nvtake -c nvchecker.toml $(cat nvtake.txt)
+
+      - name: Clean up pacman cache
+        if: always()
+        run: |
+          find /var/cache/pacman/pkg -maxdepth 1 -type d -regex '.*/download-[0-9a-zA-Z]\{6\}' -delete || :
+          find /var/cache/pacman/pkg -maxdepth 1 -type f -name 'download-*' -delete || :
