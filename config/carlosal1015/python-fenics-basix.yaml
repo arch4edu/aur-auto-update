@@ -4,5 +4,5 @@ nvchecker:
   use_latest_release: true
   prefix: v
 test: true
-oldver: 0.10.0.post0
+oldver: 0.11.0
 repository: arch4edu
