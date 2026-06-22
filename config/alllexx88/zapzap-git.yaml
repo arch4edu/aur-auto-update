@@ -1,5 +1,0 @@
-nvchecker:
-  source: github
-  github: rafatosta/zapzap
-test: true
-oldver: 20260607.195653
