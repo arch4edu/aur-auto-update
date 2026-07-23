@@ -3,4 +3,5 @@ nvchecker:
   include_regex: (\d(?:\d|\.)+)
   source: git
 test: true
+repository: arch4edu
 out_of_date: 1771200580
