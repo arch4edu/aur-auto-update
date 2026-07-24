@@ -7,3 +7,4 @@ nvchecker:
 test: true
 repository: arch4edu
 out_of_date: 1771309845
+oldver: 21.0.12.u3
