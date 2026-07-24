@@ -6,4 +6,4 @@ nvchecker:
   to_pattern: _
   prefix: v
 test: true
-oldver: 7.7.0.202606012155_r
+oldver: 7.7.1.202607240634_r
