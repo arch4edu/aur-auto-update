@@ -1,0 +1,5 @@
+nvchecker:
+  regex: mantar_([\d.]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/mantar/index.html
+test: true

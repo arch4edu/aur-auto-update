@@ -1,0 +1,5 @@
+nvchecker:
+  regex: QRM_([\d.-]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/QRM/index.html
+test: true

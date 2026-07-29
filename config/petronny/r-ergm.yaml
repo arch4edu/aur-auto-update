@@ -1,0 +1,5 @@
+nvchecker:
+  regex: ergm_([\d.]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/ergm/index.html
+test: true

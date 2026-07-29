@@ -1,0 +1,5 @@
+nvchecker:
+  regex: metaSEM_([\d.]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/metaSEM/index.html
+test: true
