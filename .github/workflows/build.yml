@@ -123,14 +123,40 @@ jobs:
           git config --global user.email 'auto-update-bot@arch4edu.org'
 
       - name: Push ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }} to AUR
+        id: push_aur
         run: |
           [ -z ${{ needs.build.outputs.diff }} ] && exit 0
-          aur-clone ${{ github.event.inputs.pkgbase }}
+          set +e
+          aur-clone ${{ github.event.inputs.pkgbase }} >/tmp/aur-clone.log 2>&1
+          clone_rc=$?
+          set -e
+          cat /tmp/aur-clone.log
+          if [ "$clone_rc" -ne 0 ]; then
+            if grep -qi 'down due to maintenance' /tmp/aur-clone.log; then
+              echo "::notice::AUR is down for maintenance; skipping push (will retry on the next run)."
+              echo "aur_down=1" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            exit "$clone_rc"
+          fi
           cd ${{ github.event.inputs.pkgbase }}
           echo ${{ needs.build.outputs.diff }} | base64 -d | git apply
-          aur-push
+          set +e
+          aur-push >/tmp/aur-push.log 2>&1
+          push_rc=$?
+          set -e
+          cat /tmp/aur-push.log
+          if [ "$push_rc" -ne 0 ]; then
+            if grep -qi 'down due to maintenance' /tmp/aur-push.log; then
+              echo "::notice::AUR is down for maintenance; skipping push (will retry on the next run)."
+              echo "aur_down=1" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            exit "$push_rc"
+          fi
 
       - name: Update the oldver in yaml
+        if: ${{ steps.push_aur.outputs.aur_down != '1' }}
         run: |
           yaml=$(find config -name ${{ github.event.inputs.pkgbase }}.yaml)
           update-yaml $yaml ${{ github.event.inputs.pkgver }}
