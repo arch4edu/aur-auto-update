@@ -5,4 +5,4 @@ nvchecker:
 test: true
 repository: arch4edu
 out_of_date: 1771200580
-oldver: 3.3.1
+oldver: 3.3.2
