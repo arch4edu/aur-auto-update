@@ -4,3 +4,4 @@ nvchecker:
   url: https://cran.r-project.org/web/packages/nanonext/index.html
 test: true
 update_script: bin/update-pkgver --target _pkgver
+oldver: 1.10.2
