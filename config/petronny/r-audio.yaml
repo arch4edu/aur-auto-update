@@ -4,3 +4,4 @@ nvchecker:
   url: https://cran.r-project.org/web/packages/audio/index.html
 test: true
 update_script: bin/update-pkgver --target _pkgver
+oldver: 0.1-12
