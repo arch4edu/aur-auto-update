@@ -1,16 +1,68 @@
 #!/bin/sh
-newver="$1"
-force="$2"
 
-if [ -z "${force}" ]
+usage() {
+	echo "Usage: update-pkgver [-f|--force] [-t|--target FIELD] NEWVER" >&2
+	exit 2
+}
+
+force=0
+target=pkgver
+
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		-f|--force)
+			force=1
+			shift
+			;;
+		-t|--target)
+			[ "$#" -ge 2 ] || usage
+			target="$2"
+			shift 2
+			;;
+		--target=*)
+			target="${1#*=}"
+			shift
+			;;
+		--)
+			shift
+			break
+			;;
+		-*)
+			usage
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+[ "$#" -eq 1 ] || usage
+newver="$1"
+
+case "$target" in
+	''|[0-9]*|*[!A-Za-z0-9_]*)
+		echo "Invalid target field: ${target}" >&2
+		exit 2
+		;;
+esac
+
+assignment=$(grep -m1 -E "^${target}=" PKGBUILD) || {
+	echo "Target field ${target} was not found in PKGBUILD." >&2
+	exit 1
+}
+oldver=$(printf '%s\n' "$assignment" | cut -d= -f2- | tr -d " '")
+
+if [ "$force" -eq 0 ] && [ "$(vercmp "$oldver" "$newver")" -eq 1 ]
 then
-	oldver=$(grep -E '^pkgver=' PKGBUILD | cut -d= -f2- | tr -d " '")
-	[ $(vercmp "${oldver}" "${newver}") -eq 1 ] && echo "The oldver ${oldver} is greater than newver ${newver}." && exit 1
+	echo "The oldver ${oldver} is greater than newver ${newver}."
+	exit 1
 fi
 
-if [ "${oldver}" != "${newver}" ]
+if [ "$oldver" != "$newver" ]
 then
-	sed "s/^pkgver=.*$/pkgver=${newver}/" -i PKGBUILD
+	escaped_newver=$(printf '%s\n' "$newver" | sed 's/[\\&|]/\\&/g')
+	sed "s|^${target}=.*$|${target}=${escaped_newver}|" -i PKGBUILD
 	sed "s/^pkgrel=.*$/pkgrel=1/" -i PKGBUILD
 fi
 

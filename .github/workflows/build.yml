@@ -43,11 +43,6 @@ jobs:
       - name: Add path
         run: echo "$(realpath bin)" >> $GITHUB_PATH
 
-      - name: Override update script
-        run: |
-          find config -name ${{ github.event.inputs.pkgbase }}.override -exec cp {} bin/update-pkgver \;
-          chmod +x bin/update-pkgver
-
       - name: Configure custom repository
         run: |
           # Try yaml-based repository configuration first
@@ -73,11 +68,34 @@ jobs:
         uses: petronny/workflow-telemetry-action@quickchart
 
       - name: Build ${{ github.event.inputs.pkgbase }} ${{ inputs.pkgver }}
+        shell: bash
+        env:
+          PKGBASE: ${{ inputs.pkgbase }}
+          PKGVER: ${{ inputs.pkgver }}
         run: |
-          aur-clone ${{ github.event.inputs.pkgbase }}
-          cd ${{ github.event.inputs.pkgbase }}
+          yaml=$(find "$GITHUB_WORKSPACE/config" -name "$PKGBASE.yaml" -print -quit)
+          [ -n "$yaml" ] || { echo "No config found for $PKGBASE." >&2; exit 1; }
+          update_spec=$(yq -r '.update_script // "bin/update-pkgver"' "$yaml")
+          read -r -a update_command <<< "$update_spec"
+          [ "${#update_command[@]}" -gt 0 ] || { echo "Empty update_script for $PKGBASE." >&2; exit 1; }
+
+          case "${update_command[0]}" in
+            /*) echo "update_script must be relative to the repository root." >&2; exit 1 ;;
+          esac
+          update_script=$(realpath -m "$GITHUB_WORKSPACE/${update_command[0]}")
+          case "$update_script" in
+            "$GITHUB_WORKSPACE"/*) ;;
+            *) echo "update_script resolves outside the repository." >&2; exit 1 ;;
+          esac
+          [ -f "$update_script" ] && [ -x "$update_script" ] || {
+            echo "update_script is not an executable file: ${update_command[0]}" >&2
+            exit 1
+          }
+
+          aur-clone "$PKGBASE"
+          cd "$PKGBASE"
           chown makepkg:root -R .
-          update-pkgver ${{ github.event.inputs.pkgver }} || exit 0
+          "$update_script" "${update_command[@]:1}" "$PKGVER" || exit 0
           su makepkg -c recv-gpg-keys || :
           if [ -f /usr/bin/custom-x86_64-build ]
           then
