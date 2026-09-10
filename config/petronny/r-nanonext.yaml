@@ -3,5 +3,6 @@ nvchecker:
   source: regex
   url: https://cran.r-project.org/web/packages/nanonext/index.html
 test: true
+repository: arch4edu
 update_script: bin/update-pkgver --target _pkgver
 oldver: 1.10.2
