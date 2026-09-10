@@ -5,4 +5,4 @@ nvchecker:
 test: true
 repository: arch4edu
 update_script: bin/update-pkgver --target _pkgver
-oldver: 0.4.0
+oldver: 0.5.0
