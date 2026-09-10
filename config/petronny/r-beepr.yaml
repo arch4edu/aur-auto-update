@@ -4,3 +4,4 @@ nvchecker:
   url: https://cran.r-project.org/web/packages/beepr/index.html
 test: true
 repository: arch4edu
+oldver: 2.0
