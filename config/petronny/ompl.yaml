@@ -1,0 +1,7 @@
+nvchecker:
+  github: ompl/ompl
+  source: github
+  use_latest_release: true
+test: true
+repository: arch4edu
+oldver: 2.0.0
