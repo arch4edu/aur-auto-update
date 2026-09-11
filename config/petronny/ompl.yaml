@@ -4,4 +4,4 @@ nvchecker:
   use_latest_release: true
 test: true
 repository: arch4edu
-oldver: 2.0.0
+oldver: 2.0.2
