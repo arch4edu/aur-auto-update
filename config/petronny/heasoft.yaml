@@ -4,5 +4,5 @@ nvchecker:
   url: https://heasarc.gsfc.nasa.gov/docs/software/lheasoft/release_notes.html
 test: true
 repository: arch4edu
-oldver: 6.36
+oldver: 6.37.1
 clean-up-ubuntu: true
