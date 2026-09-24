@@ -5,4 +5,4 @@ nvchecker:
   prefix: v
 test: true
 update_script: config/alllexx88/zapzap.update
-oldver: 7.4.4
+oldver: 7.4.5
