@@ -4,5 +4,5 @@ nvchecker:
   use_max_tag: true
   prefix: v
 test: true
-oldver: 2026.09.25
+oldver: 2026.09.26
 repository: arch4edu
