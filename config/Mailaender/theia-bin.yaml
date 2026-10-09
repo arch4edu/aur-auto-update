@@ -5,4 +5,4 @@ nvchecker:
   query: v
   prefix: v
 test: true
-oldver: 1.73.100
+oldver: 1.76.0
