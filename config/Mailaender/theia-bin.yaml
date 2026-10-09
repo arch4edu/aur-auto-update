@@ -2,6 +2,7 @@ nvchecker:
   github: eclipse-theia/theia-ide
   source: github
   use_latest_tag: true
+  query: v
   prefix: v
 test: true
 oldver: 1.73.100
