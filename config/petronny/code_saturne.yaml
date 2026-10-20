@@ -3,6 +3,7 @@ nvchecker:
   source: github
   use_max_tag: true
   prefix: v
+  include_regex: 'v[0-9]+(\.[0-9]+)+'
 test: true
 repository: arch4edu
 oldver: 9.2.0
