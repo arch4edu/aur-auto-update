@@ -1,0 +1,8 @@
+nvchecker:
+  github: code-saturne/code_saturne
+  source: github
+  use_max_tag: true
+  prefix: v
+test: true
+repository: arch4edu
+oldver: 9.2.0
