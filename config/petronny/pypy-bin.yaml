@@ -1,6 +1,6 @@
 nvchecker:
-  regex: pypy2.7-v([\d.]+)-src.tar.bz2
+  regex: pypy2.7-v([\d.]+)-src.tar.gz
   source: regex
   url: https://www.pypy.org/download.html
 test: true
-oldver: 7.3.23
+oldver: 8.0.1
