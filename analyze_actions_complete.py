@@ -4,6 +4,7 @@ import subprocess
 import json
 import os
 import re
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,9 +12,20 @@ from typing import List, Dict
 
 import yaml
 
-def run_gh_command(args: List[str]) -> str:
-    result = subprocess.run(['gh'] + args, capture_output=True, text=True, check=True)
-    return result.stdout
+def run_gh_command(args: List[str], retries: int = 3, delay: float = 3.0) -> str:
+    last_error: Exception | None = None
+    for attempt in range(1, retries + 1):
+        try:
+            result = subprocess.run(['gh'] + args, capture_output=True, text=True, check=True)
+            return result.stdout
+        except subprocess.CalledProcessError as e:
+            last_error = e
+            if attempt < retries:
+                detail = (e.stderr or '').strip().splitlines()
+                detail = detail[-1][:160] if detail else f'exit {e.returncode}'
+                print(f"   ⚠️  gh command failed (attempt {attempt}/{retries}): {detail}; retrying in {delay:g}s...")
+                time.sleep(delay)
+    raise last_error if last_error else RuntimeError("gh command failed")
 
 def get_check_update_time() -> tuple[datetime, str]:
     print("🔍 Getting last check update action time...")
@@ -69,34 +81,48 @@ def query_aur_packages(package_names: List[str]) -> Dict[str, tuple]:
     for pkg in package_names:
         query_parts.append(f"arg[]={urllib.request.quote(pkg)}")
     url = f"https://aur.archlinux.org/rpc/?{'&'.join(query_parts)}"
-    with urllib.request.urlopen(url, timeout=30) as response:
-        data = json.loads(response.read().decode())
-        aur_info = {}
-        bot_identifiers = ['AutoUpdateBot', 'auto-update-bot@arch4edu.org', 'arch4edu']
-        for pkg_info in data.get('results', []):
-            name = pkg_info.get('Name')
-            last_modified = pkg_info.get('LastModified')
-            maintainer = pkg_info.get('Maintainer') or ''
-            comaintainers = pkg_info.get('CoMaintainers') or []
-            if name and last_modified:
-                is_co_maintainer = False
-                all_maintainers = [maintainer] + comaintainers
-                for maint in all_maintainers:
-                    if not maint:
-                        continue
-                    for bot_id in bot_identifiers:
-                        if bot_id in maint:
-                            is_co_maintainer = True
-                            break
-                    if is_co_maintainer:
+    # Retry up to 3 times on SSL/network errors
+    max_retries = 3
+    data = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            with urllib.request.urlopen(url, timeout=30) as response:
+                data = json.loads(response.read().decode())
+                break
+        except Exception as e:
+            if attempt < max_retries:
+                wait = attempt * 3
+                print(f"   ⚠️  AUR query attempt {attempt} failed ({e}), retrying in {wait}s...")
+                time.sleep(wait)
+            else:
+                print(f"   ❌ AUR query failed after {max_retries} attempts: {e}")
+                return {}
+    aur_info = {}
+    bot_identifiers = ['AutoUpdateBot', 'auto-update-bot@arch4edu.org', 'arch4edu']
+    for pkg_info in data.get('results', []):
+        name = pkg_info.get('Name')
+        last_modified = pkg_info.get('LastModified')
+        maintainer = pkg_info.get('Maintainer') or ''
+        comaintainers = pkg_info.get('CoMaintainers') or []
+        if name and last_modified:
+            is_co_maintainer = False
+            all_maintainers = [maintainer] + comaintainers
+            for maint in all_maintainers:
+                if not maint:
+                    continue
+                for bot_id in bot_identifiers:
+                    if bot_id in maint:
+                        is_co_maintainer = True
                         break
-                aur_info[name] = (
-                    datetime.fromtimestamp(last_modified, tz=timezone.utc),
-                    is_co_maintainer,
-                    pkg_info.get('OutOfDate')  # 可能为 0 或 None
-                )
-        print(f"   Successfully retrieved AUR info for {len(aur_info)}/{len(package_names)} packages")
-        return aur_info
+                if is_co_maintainer:
+                    break
+            aur_info[name] = (
+                datetime.fromtimestamp(last_modified, tz=timezone.utc),
+                is_co_maintainer,
+                pkg_info.get('OutOfDate')  # 可能为 0 或 None
+            )
+    print(f"   Successfully retrieved AUR info for {len(aur_info)}/{len(package_names)} packages")
+    return aur_info
 
 def get_check_run_info(run_id: str) -> dict:
     """解析 check-update run 日志，提取 aur_missing 和 nvchecker_failed 的包集合"""
@@ -106,39 +132,23 @@ def get_check_run_info(run_id: str) -> dict:
         
         aur_missing_packages = set()
         nvchecker_failed_packages = set()
-        in_process_updates = False
-        
+
         for line in lines:
-            # 检测 Process updates 步骤
-            if 'Process updates' in line and 'python process-update.py' in line:
-                in_process_updates = True
-                continue
-            elif in_process_updates and line.startswith('update	'):
-                # 解析 "doesn't exist on AUR"
-                if "doesn't exist on AUR" in line:
-                    # 格式: "update	Process updates	HH:MM:SS.mmsZ python-librosa doesn't exist on AUR."
-                    parts = line.split()
-                    # 查找包名（通常在 "doesn't exist" 之前）
-                    for i, part in enumerate(parts):
-                        if "doesn't" in part or "exist" in part:
-                            if i > 0:
-                                pkg = parts[i-1]
-                                aur_missing_packages.add(pkg)
-                            break
-                # 解析 "Failed to check update for <pkg>: event=..."
-                elif "Failed to check update for" in line:
-                    # 格式: "update	Process updates	HH:MM:SS.mmsZ Failed to check update for twitch-dl: event=running cmd."
-                    # 提取包名
-                    import re
-                    match = re.search(r'Failed to check update for (\S+):', line)
-                    if match:
-                        pkg = match.group(1)
-                        # 排除 event=running cmd 的情况（已被 process-update 忽略）
-                        if "event=running cmd" not in line:
-                            nvchecker_failed_packages.add(pkg)
-                # 检测是否离开 Process updates 步骤
-                elif line.startswith('update	Post Run'):
-                    in_process_updates = False
+            # Step names are not reliable in the log (GitHub may render them as
+            # "UNKNOWN STEP"), so scan the whole log for these markers.
+            if "doesn't exist on AUR" in line:
+                # e.g. "... python-librosa doesn't exist on AUR."
+                parts = line.split()
+                for i, part in enumerate(parts):
+                    if "doesn't" in part or "exist" in part:
+                        if i > 0:
+                            aur_missing_packages.add(parts[i-1])
+                        break
+            elif "Failed to check update for" in line:
+                # e.g. "... Failed to check update for twitch-dl: event=running cmd."
+                match = re.search(r'Failed to check update for (\S+):', line)
+                if match and "event=running cmd" not in line:
+                    nvchecker_failed_packages.add(match.group(1))
         
         return {
             'aur_missing': aur_missing_packages,
@@ -216,7 +226,7 @@ def get_manual_fix_commits_since(check_time: datetime) -> set:
         since_time_utc = check_time.strftime('%Y-%m-%dT%H:%M:%SZ')
         result = subprocess.run(
             ['git', 'log', f'--since={since_time_utc}', '--format=%H|%an|%ai|%s', '--name-only'],
-            cwd='/home/petron/auto_update_bot/aur-auto-update',
+            cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True, text=True, check=False
         )
         lines = result.stdout.split('\n')
@@ -283,8 +293,8 @@ def process_builds(build_runs: List[Dict], aur_info: Dict[str, tuple], check_tim
     check_run_info = get_check_run_info(check_run_id)
     aur_missing_packages = check_run_info.get('aur_missing', set())
     nvchecker_failed_packages = check_run_info.get('nvchecker_failed', set())
-    print(f"   Found {len(aur_missing_packages)} packages missing on AUR")
-    print(f"   Found {len(nvchecker_failed_packages)} packages with nvchecker failures")
+    print(f"   Found {len(aur_missing_packages)} packages missing on AUR" + (f": {', '.join(sorted(aur_missing_packages))}" if aur_missing_packages else ""))
+    print(f"   Found {len(nvchecker_failed_packages)} packages with nvchecker failures" + (f": {', '.join(sorted(nvchecker_failed_packages))}" if nvchecker_failed_packages else ""))
 
     # Calculate dynamic column widths (no AURUpdate column)
     all_packages = [build['package'] for build in build_runs]
@@ -443,6 +453,20 @@ def main():
         recent_build_runs = get_build_test_runs_since(check_time)
         if not recent_build_runs:
             print("⚠️  No build test runs found after check update")
+            # Still surface check-update problems (missing on AUR, nvchecker failures)
+            print("\n🔍 Analyzing check-update run for aur_missing and nvchecker_failed states...")
+            check_run_info = get_check_run_info(check_run_id)
+            aur_missing = check_run_info.get('aur_missing', set())
+            nvchecker_failed = check_run_info.get('nvchecker_failed', set())
+            print(f"   Found {len(aur_missing)} packages missing on AUR" + (f": {', '.join(sorted(aur_missing))}" if aur_missing else ""))
+            print(f"   Found {len(nvchecker_failed)} packages with nvchecker failures" + (f": {', '.join(sorted(nvchecker_failed))}" if nvchecker_failed else ""))
+            print("=" * 60)
+            summary_parts = []
+            if nvchecker_failed:
+                summary_parts.append(f"⚠️{len(nvchecker_failed)}")
+            if aur_missing:
+                summary_parts.append(f"⬜{len(aur_missing)}")
+            print(f"Total: 0 packages ({' '.join(summary_parts) if summary_parts else 'none'})")
             return
         print("\n🔧 Analyzing build test runs...")
         build_data = []
