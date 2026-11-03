@@ -1,0 +1,8 @@
+nvchecker:
+  regex: charport_([\d.]+).tar.gz
+  source: regex
+  url: https://cran.r-project.org/web/packages/charport/index.html
+test: true
+repository: arch4edu
+update_script: bin/update-pkgver --target _pkgver
+oldver: 0.1.1
