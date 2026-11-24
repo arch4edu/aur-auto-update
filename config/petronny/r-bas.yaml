@@ -4,4 +4,4 @@ nvchecker:
   url: https://cran.r-project.org/web/packages/BAS/index.html
 test: true
 repository: arch4edu
-oldver: 2.0.2
+oldver: 2.1.0
